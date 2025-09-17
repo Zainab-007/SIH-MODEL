@@ -1,0 +1,124 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Government-Tech Design System */
+
+@layer base {
+  :root {
+    /* Core Brand Colors - Government Blue Theme */
+    --background: 0 0% 100%;
+    --foreground: 222 15% 15%;
+    
+    /* Primary - Government Blue */
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 98%;
+    --primary-muted: 221 83% 95%;
+    --primary-dark: 221 83% 35%;
+    
+    /* Secondary - Professional Grey */
+    --secondary: 215 16% 47%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-muted: 215 16% 95%;
+    
+    /* Accent - Success Blue */
+    --accent: 200 98% 39%;
+    --accent-foreground: 0 0% 98%;
+    --accent-muted: 200 98% 95%;
+    
+    /* Surface Colors */
+    --card: 0 0% 100%;
+    --card-foreground: 222 15% 15%;
+    --card-hover: 0 0% 98%;
+    
+    --surface: 220 13% 97%;
+    --surface-hover: 220 13% 95%;
+    
+    /* Neutral Grays */
+    --muted: 220 13% 91%;
+    --muted-foreground: 215 16% 47%;
+    
+    /* Interactive Elements */
+    --border: 220 13% 91%;
+    --input: 0 0% 100%;
+    --ring: 221 83% 53%;
+    
+    /* Status Colors */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+    --warning: 45 93% 47%;
+    --warning-foreground: 0 0% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Government Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%), hsl(221 83% 35%));
+    --gradient-surface: linear-gradient(135deg, hsl(220 13% 97%), hsl(220 13% 91%));
+    --gradient-accent: linear-gradient(135deg, hsl(200 98% 39%), hsl(221 83% 53%));
+    --gradient-hero: linear-gradient(135deg, hsl(221 83% 53%) 0%, hsl(200 98% 39%) 100%);
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.06);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -2px hsl(0 0% 0% / 0.05);
+    --shadow-glow: 0 0 20px hsl(221 83% 53% / 0.2);
+    
+    /* Layout */
+    --radius: 8px;
+    --radius-sm: 6px;
+    --radius-lg: 12px;
+    
+    /* Animations */
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.1s ease-out;
+  }
+
+  .dark {
+    /* Dark mode - Government Blue Theme */
+    --background: 222 15% 7%;
+    --foreground: 0 0% 98%;
+    
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 98%;
+    --primary-muted: 221 83% 15%;
+    
+    --secondary: 215 16% 47%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-muted: 215 16% 12%;
+    
+    --accent: 200 98% 39%;
+    --accent-foreground: 0 0% 98%;
+    --accent-muted: 200 98% 15%;
+    
+    --card: 222 15% 9%;
+    --card-foreground: 0 0% 98%;
+    --card-hover: 222 15% 11%;
+    
+    --surface: 222 15% 10%;
+    --surface-hover: 222 15% 12%;
+    
+    --muted: 222 15% 15%;
+    --muted-foreground: 215 16% 65%;
+    
+    --border: 222 15% 15%;
+    --input: 222 15% 9%;
+    --ring: 221 83% 53%;
+    
+    --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%), hsl(221 83% 35%));
+    --gradient-surface: linear-gradient(135deg, hsl(222 15% 9%), hsl(222 15% 15%));
+    --gradient-accent: linear-gradient(135deg, hsl(200 98% 39%), hsl(221 83% 53%));
+    --gradient-hero: linear-gradient(135deg, hsl(221 83% 53%) 0%, hsl(200 98% 39%) 100%);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
