@@ -60,11 +60,10 @@ const Home = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20" />
         <div className="relative px-8 py-12 text-center">
           <h1 className="text-4xl font-bold text-white mb-4">
-            Smart Internship Allocation System
+            Optima — Where Talent Meets Opportunity
           </h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto">
-            Efficiently matching students with perfect internship opportunities using 
-            advanced algorithms and comprehensive assessment.
+            As SIH 2025 innovators, we present Optima, a smart allocation platform that bridges the gap between student talent and real-world opportunities. By leveraging AI-driven matching, we make internships fair, accessible, and future-ready, so that skills, not connections, decide success.
           </p>
           <div className="mt-6">
             <Badge className="bg-white/20 text-white border-white/20 hover:bg-white/30">

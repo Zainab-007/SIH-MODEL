@@ -93,7 +93,7 @@ const Auth = () => {
             <div className="p-3 rounded-full bg-gradient-primary w-fit mx-auto mb-4">
               <GraduationCap className="h-8 w-8 text-white" />
             </div>
-            <CardTitle className="text-2xl font-bold">Smart Internship System</CardTitle>
+            <CardTitle className="text-2xl font-bold">Optima</CardTitle>
             <CardDescription>
               Sign in to access your dashboard
             </CardDescription>

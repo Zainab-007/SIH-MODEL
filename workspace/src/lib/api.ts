@@ -1,4 +1,4 @@
-// API integration for Smart Internship Allocation System
+// API integration for Optima platform
 
 const API_BASE_URL = 'http://localhost:5000'; // Update this to your backend URL
 

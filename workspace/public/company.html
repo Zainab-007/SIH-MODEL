@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Portal - Optima</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: 221 83% 53%;
+      --primary-foreground: 0 0% 98%;
+      --background: 0 0% 100%;
+      --foreground: 222 15% 15%;
+      --secondary: 215 16% 47%;
+      --secondary-foreground: 0 0% 98%;
+      --surface: 220 13% 97%;
+      --border: 220 13% 91%;
+      --success: 142 76% 36%;
+      --destructive: 0 84% 60%;
+      --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.06);
+      --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -2px hsl(0 0% 0% / 0.05);
+      --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%), hsl(221 83% 35%));
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: hsl(var(--surface));
+      color: hsl(var(--foreground));
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: hsl(var(--background));
+      border-bottom: 1px solid hsl(var(--border));
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-md);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-button {
+      padding: 0.5rem 1rem;
+      background: var(--gradient-primary);
+      color: hsl(var(--primary-foreground));
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .nav-button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: hsl(var(--foreground));
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: hsl(var(--secondary));
+    }
+
+    .content-card {
+      background: hsl(var(--background));
+      border: 1px solid hsl(var(--border));
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      animation: fadeInUp 0.6s ease-out 0.2s forwards;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: hsl(var(--foreground));
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: hsl(var(--background));
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid hsl(var(--border));
+    }
+
+    th {
+      background: hsl(var(--surface));
+      font-weight: 600;
+      color: hsl(var(--foreground));
+    }
+
+    tbody tr:hover {
+      background: hsl(var(--surface) / 0.5);
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .status-pending {
+      background: hsl(45 93% 47% / 0.1);
+      color: hsl(45 93% 47%);
+    }
+
+    .status-reviewing {
+      background: hsl(var(--primary) / 0.1);
+      color: hsl(var(--primary));
+    }
+
+    .status-shortlisted {
+      background: hsl(var(--success) / 0.1);
+      color: hsl(var(--success));
+    }
+
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+
+    .skill-tag {
+      background: hsl(var(--primary) / 0.1);
+      color: hsl(var(--primary));
+      padding: 0.125rem 0.5rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: hsl(var(--secondary));
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 1rem;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+
+      .page-title {
+        font-size: 2rem;
+      }
+
+      .table-container {
+        font-size: 0.875rem;
+      }
+
+      th, td {
+        padding: 0.75rem 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">🏢 Optima</div>
+    <a href="doe.html" class="nav-button">← Back to Home</a>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">Company Portal</h1>
+      <p class="page-subtitle">Manage your internship applications and discover talented students</p>
+    </div>
+
+    <div class="content-card">
+      <h2 class="section-title">
+        <span>👥</span>
+        Student Applications
+      </h2>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>👤 Name</th>
+              <th>🛠️ Skills</th>
+              <th>🎯 Status</th>
+              <th>📊 Score</th>
+              <th>📅 Applied</th>
+            </tr>
+          </thead>
+          <tbody id="applicationsTable">
+            <!-- Applications will be loaded here -->
+          </tbody>
+        </table>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <div class="empty-icon">📝</div>
+          <h3>No Applications Yet</h3>
+          <p>Student applications will appear here once they start applying to your internships.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- About Us Section -->
+  <div class="container">
+    <div class="content-card" style="margin-top: 2rem;">
+      <h2 class="section-title">Optima — Where Talent Meets Opportunity</h2>
+      <p style="font-weight: 600; color: hsl(var(--primary)); margin-bottom: 1rem;">📖 About Us (SIH 2025):</p>
+      <p style="color: hsl(var(--secondary)); line-height: 1.7;">
+        As SIH 2025 innovators, we present Optima, a smart allocation platform that bridges the gap between student talent and real-world opportunities. By leveraging AI-driven matching, we make internships fair, accessible, and future-ready, so that skills, not connections, decide success.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Sample data for student applications
+    const applications = [
+      {
+        name: "Alice Johnson",
+        skills: ["React", "Node.js", "TypeScript", "MongoDB"],
+        status: "shortlisted",
+        score: 92,
+        appliedDate: "2025-01-15"
+      },
+      {
+        name: "Bob Wilson",
+        skills: ["Python", "Django", "PostgreSQL", "Docker"],
+        status: "reviewing",
+        score: 87,
+        appliedDate: "2025-01-14"
+      },
+      {
+        name: "Carol Davis",
+        skills: ["Java", "Spring Boot", "MySQL", "AWS"],
+        status: "pending",
+        score: 79,
+        appliedDate: "2025-01-13"
+      },
+      {
+        name: "David Chen",
+        skills: ["Vue.js", "Express", "Redis", "GraphQL"],
+        status: "reviewing",
+        score: 84,
+        appliedDate: "2025-01-12"
+      },
+      {
+        name: "Emma Rodriguez",
+        skills: ["React Native", "Flutter", "Firebase"],
+        status: "shortlisted",
+        score: 90,
+        appliedDate: "2025-01-11"
+      }
+    ];
+
+    function getStatusBadge(status) {
+      const statusMap = {
+        'pending': { class: 'status-pending', text: 'Pending' },
+        'reviewing': { class: 'status-reviewing', text: 'Under Review' },
+        'shortlisted': { class: 'status-shortlisted', text: 'Shortlisted' }
+      };
+      
+      const statusInfo = statusMap[status] || statusMap['pending'];
+      return `<span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>`;
+    }
+
+    function renderSkills(skills) {
+      return skills.map(skill => 
+        `<span class="skill-tag">${skill}</span>`
+      ).join('');
+    }
+
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+
+    function loadApplications() {
+      const tableBody = document.getElementById('applicationsTable');
+      const emptyState = document.getElementById('emptyState');
+
+      if (applications.length === 0) {
+        tableBody.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      tableBody.innerHTML = applications.map(app => `
+        <tr>
+          <td><strong>${app.name}</strong></td>
+          <td>
+            <div class="skills-list">
+              ${renderSkills(app.skills)}
+            </div>
+          </td>
+          <td>${getStatusBadge(app.status)}</td>
+          <td><strong>${app.score}%</strong></td>
+          <td>${formatDate(app.appliedDate)}</td>
+        </tr>
+      `).join('');
+
+      emptyState.style.display = 'none';
+    }
+
+    // Load applications when page loads
+    document.addEventListener('DOMContentLoaded', loadApplications);
+  </script>
+</body>
+</html>

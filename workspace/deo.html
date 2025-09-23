@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TalentSphere</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+    .gradient-button {
+      background: linear-gradient(to right, #6366f1, #3b82f6);
+      color: white;
+      transition: all 0.3s ease;
+    }
+    .gradient-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59,130,246,0.5);
+    }
+  </style>
+</head>
+<body class="text-gray-200">
+
+  <nav class="glass-card fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4">
+    <h1 class="text-2xl font-extrabold text-white">Optima </h1>
+    <div class="space-x-6 hidden sm:flex">
+      <a href="#candidates" class="hover:text-blue-400 transition">Candidates</a>
+      <a href="#history" class="hover:text-blue-400 transition">History</a>
+      <a href="#about" class="hover:text-blue-400 transition">About</a>
+    </div>
+    <button class="gradient-button px-5 py-2 rounded-full font-semibold shadow-lg">Sign In</button>
+  </nav>
+
+  <section class="pt-28 pb-16 text-center">
+    <h2 class="text-5xl font-extrabold text-white">Discover Top Talent</h2>
+    <p class="text-lg text-gray-400 mt-4">Evaluate, shortlist, and hire the best candidates in one place.</p>
+    <div class="mt-6">
+      <button class="gradient-button px-6 py-3 rounded-full font-semibold shadow-lg">Get Started</button>
+    </div>
+  </section>
+
+  <section id="candidates" class="max-w-6xl mx-auto px-6 py-12">
+    <h3 class="text-3xl font-bold text-white mb-8">Pending Candidates</h3>
+    <div id="candidate-list" class="grid md:grid-cols-2 gap-8"></div>
+  </section>
+
+  <section id="history" class="max-w-6xl mx-auto px-6 py-12">
+    <h3 class="text-3xl font-bold text-white mb-8">Talent History</h3>
+
+    <h4 class="text-xl font-semibold text-green-400 mb-4">✅ Accepted</h4>
+    <div id="accepted-list" class="grid md:grid-cols-2 gap-8 mb-10"></div>
+
+    <h4 class="text-xl font-semibold text-red-400 mb-4">❌ Rejected</h4>
+    <div id="rejected-list" class="grid md:grid-cols-2 gap-8"></div>
+  </section>
+
+  <section id="about" class="max-w-4xl mx-auto px-6 py-16 text-center">
+    <h3 class="text-3xl font-bold text-white mb-4">About Optima 
+</h3>
+    <p class="text-gray-400 leading-relaxed">
+      We are a team participating in SIH 2025, building Optima, an AI-powered engine that ensures fair,
+      transparent, and skill-based internship allocation. Our goal is to eliminate bias and struggle, empowering students with equal access to opportunities across India.
+    </p>
+  </section>
+
+  <footer class="glass-card text-center py-6 mt-12">
+    <p class="text-gray-400 text-sm">© 2025 Optima . All rights reserved.</p>
+  </footer>
+
+  <script>
+    const candidates = [
+      { name: "Alice Johnson", location: "San Francisco, CA", skills: ["React", "Node.js", "Figma"], score: 92 },
+      { name: "Bob Williams", location: "Austin, TX", skills: ["Python", "SQL", "Data Analysis"], score: 78 },
+      { name: "Chris Evans", location: "New York, NY", skills: ["Java", "Spring Boot", "AWS"], score: 85 }
+    ];
+
+    const accepted = [];
+    const rejected = [];
+
+    const candidateList = document.getElementById("candidate-list");
+    const acceptedList = document.getElementById("accepted-list");
+    const rejectedList = document.getElementById("rejected-list");
+
+    function renderCard(c, status) {
+      let colorClass = "";
+      if (status === "accepted") colorClass = "border-green-400";
+      if (status === "rejected") colorClass = "border-red-400";
+
+      return `
+        <div class="glass-card rounded-2xl p-6 border-l-4 ${colorClass}">
+          <h4 class="text-2xl font-bold text-white">${c.name}</h4>
+          <p class="text-gray-400 mt-2">📍 ${c.location}</p>
+          <div class="mt-4">
+            <p class="text-sm text-gray-400">Skills:</p>
+            <div class="flex flex-wrap gap-2 mt-1">
+              ${c.skills.map(s => `<span class="bg-indigo-900/70 text-indigo-200 px-3 py-1 rounded-full text-sm">${s}</span>`).join("")}
+            </div>
+          </div>
+          <div class="flex justify-between items-center mt-6">
+            <span class="text-blue-400 font-bold text-xl">${c.score}%</span>
+            <span class="text-sm ${status==="accepted" ? "text-green-400" : "text-red-400"} font-semibold">
+              ${status === "accepted" ? "✔ Accepted" : "✘ Rejected"}
+            </span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCandidates() {
+      candidateList.innerHTML = "";
+      candidates.forEach((c, index) => {
+        const card = document.createElement("div");
+        card.className = "glass-card rounded-2xl p-6 hover:scale-[1.02] transition-transform";
+        card.innerHTML = `
+          <h4 class="text-2xl font-bold text-white">${c.name}</h4>
+          <p class="text-gray-400 mt-2">📍 ${c.location}</p>
+          <div class="mt-4">
+            <p class="text-sm text-gray-400">Skills:</p>
+            <div class="flex flex-wrap gap-2 mt-1">
+              ${c.skills.map(s => `<span class="bg-indigo-900/70 text-indigo-200 px-3 py-1 rounded-full text-sm">${s}</span>`).join("")}
+            </div>
+          </div>
+          <div class="flex justify-between items-center mt-6">
+            <span class="text-blue-400 font-bold text-xl">${c.score}%</span>
+            <div class="space-x-2">
+              <button onclick="acceptCandidate(${index})" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-full text-sm font-semibold">Approve</button>
+              <button onclick="rejectCandidate(${index})" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-full text-sm font-semibold">Reject</button>
+            </div>
+          </div>
+        `;
+        candidateList.appendChild(card);
+      });
+    }
+
+    function renderHistory() {
+      acceptedList.innerHTML = accepted.map(c => renderCard(c, "accepted")).join("");
+      rejectedList.innerHTML = rejected.map(c => renderCard(c, "rejected")).join("");
+    }
+
+    function acceptCandidate(index) {
+      const candidate = candidates.splice(index, 1)[0];
+      accepted.push(candidate);
+      renderCandidates();
+      renderHistory();
+    }
+
+    function rejectCandidate(index) {
+      const candidate = candidates.splice(index, 1)[0];
+      rejected.push(candidate);
+      renderCandidates();
+      renderHistory();
+    }
+
+    // Initial render
+    renderCandidates();
+    renderHistory();
+  </script>
+</body>
+</html>

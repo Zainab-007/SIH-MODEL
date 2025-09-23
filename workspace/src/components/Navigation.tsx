@@ -26,7 +26,7 @@ export const Navigation = () => {
               <div className="p-2 rounded-lg bg-gradient-primary">
                 <Shield className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-foreground">SIA System</span>
+              <span className="text-xl font-bold text-foreground">Optima</span>
             </div>
             
             <div className="hidden md:flex space-x-1">

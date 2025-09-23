@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Optima — Where Talent Meets Opportunity</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: 221 83% 53%;
+      --primary-foreground: 0 0% 98%;
+      --background: 0 0% 100%;
+      --foreground: 222 15% 15%;
+      --secondary: 215 16% 47%;
+      --secondary-foreground: 0 0% 98%;
+      --surface: 220 13% 97%;
+      --border: 220 13% 91%;
+      --success: 142 76% 36%;
+      --destructive: 0 84% 60%;
+      --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.06);
+      --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -2px hsl(0 0% 0% / 0.05);
+      --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%), hsl(221 83% 35%));
+      --gradient-surface: linear-gradient(135deg, hsl(220 13% 97%), hsl(220 13% 91%));
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: hsl(var(--surface));
+      color: hsl(var(--foreground));
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .hero-section {
+      text-align: center;
+      margin-bottom: 4rem;
+      padding: 3rem 0;
+      background: var(--gradient-surface);
+      border-radius: 16px;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out 0.2s forwards;
+    }
+
+    .hero-title {
+      font-size: 3rem;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: hsl(var(--secondary));
+      margin-bottom: 2rem;
+    }
+
+    .role-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    .role-card {
+      background: hsl(var(--background));
+      border: 1px solid hsl(var(--border));
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .role-card:nth-child(1) { animation-delay: 0.3s; }
+    .role-card:nth-child(2) { animation-delay: 0.5s; }
+    .role-card:nth-child(3) { animation-delay: 0.7s; }
+
+    .role-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+      border-color: hsl(var(--primary));
+    }
+
+    .role-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--gradient-primary);
+      border-radius: 16px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: white;
+      transition: all 0.3s ease;
+    }
+
+    .role-card:hover .role-icon {
+      transform: scale(1.1);
+    }
+
+    .role-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: hsl(var(--foreground));
+    }
+
+    .role-description {
+      color: hsl(var(--secondary));
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .about-section {
+      background: hsl(var(--background));
+      border: 1px solid hsl(var(--border));
+      border-radius: 16px;
+      padding: 3rem;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out 0.9s forwards;
+    }
+
+    .about-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: hsl(var(--foreground));
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .about-subtitle {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: hsl(var(--primary));
+      margin-bottom: 1.5rem;
+    }
+
+    .about-text {
+      color: hsl(var(--secondary));
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes ripple {
+      0% {
+        transform: scale(0);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    .role-card::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: hsl(var(--primary) / 0.3);
+      transition: all 0.6s ease;
+      transform: translate(-50%, -50%);
+      z-index: -1;
+    }
+
+    .role-card:active::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .role-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2rem;
+      }
+      
+      .role-cards {
+        grid-template-columns: 1fr;
+      }
+      
+      .container {
+        padding: 1rem;
+      }
+      
+      .about-section {
+        padding: 2rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-title {
+        font-size: 1.75rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero-section">
+      <h1 class="hero-title">Optima</h1>
+      <p class="hero-subtitle">Where Talent Meets Opportunity</p>
+    </div>
+
+    <div class="role-cards">
+      <div class="role-card" onclick="navigateToRole('admin')">
+        <div class="role-icon">🏛️</div>
+        <h3 class="role-title">Admin</h3>
+        <p class="role-description">Manage the allocation system, monitor applications, and run smart matching algorithms to ensure fair distribution of internship opportunities.</p>
+      </div>
+
+      <div class="role-card" onclick="navigateToRole('company')">
+        <div class="role-icon">🏢</div>
+        <h3 class="role-title">Company</h3>
+        <p class="role-description">Post internship opportunities, review student applications, and discover talented candidates for your organization.</p>
+      </div>
+
+      <div class="role-card" onclick="navigateToRole('student')">
+        <div class="role-icon">🎓</div>
+        <h3 class="role-title">Student</h3>
+        <p class="role-description">Create your profile, showcase your skills, and apply for internships that match your interests and qualifications.</p>
+      </div>
+    </div>
+
+    <div class="about-section">
+      <h2 class="about-title">Optima — Where Talent Meets Opportunity</h2>
+      <p class="about-subtitle">📖 About Us (SIH 2025):</p>
+      <p class="about-text">
+        As SIH 2025 innovators, we present Optima, a smart allocation platform that bridges the gap between student talent and real-world opportunities. By leveraging AI-driven matching, we make internships fair, accessible, and future-ready, so that skills, not connections, decide success.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    function navigateToRole(role) {
+      switch(role) {
+        case 'admin':
+          window.location.href = 'admin.html';
+          break;
+        case 'company':
+          window.location.href = 'company.html';
+          break;
+        case 'student':
+          window.location.href = 'student.html';
+          break;
+      }
+    }
+
+    // Add ripple effect on click
+    document.querySelectorAll('.role-card').forEach(card => {
+      card.addEventListener('click', function(e) {
+        let ripple = document.createElement('span');
+        this.appendChild(ripple);
+        
+        let x = e.clientX - e.target.offsetLeft;
+        let y = e.clientY - e.target.offsetTop;
+        
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      });
+    });
+  </script>
+</body>
+</html>

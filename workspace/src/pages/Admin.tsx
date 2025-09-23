@@ -38,7 +38,7 @@ const Admin = () => {
           <div>
             <h1 className="text-3xl font-bold text-foreground">Admin Panel</h1>
             <p className="text-muted-foreground">
-              Manage the Smart Internship Allocation System
+              Manage Optima — Where Talent Meets Opportunity
             </p>
           </div>
         </div>

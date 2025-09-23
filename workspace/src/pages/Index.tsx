@@ -53,14 +53,14 @@ const Index = () => {
                 Smart AI-Powered Allocation
               </Badge>
               <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight">
-                Smart Internship
+                Optima — Where Talent
                 <br />
                 <span className="text-transparent bg-gradient-to-r from-white to-white/80 bg-clip-text">
-                  Allocation System
+                  Meets Opportunity
                 </span>
               </h1>
               <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
-                Revolutionary platform that matches students with perfect internship opportunities using advanced algorithms and comprehensive skill assessment.
+                As SIH 2025 innovators, we present Optima, a smart allocation platform that bridges the gap between student talent and real-world opportunities. By leveraging AI-driven matching, we make internships fair, accessible, and future-ready, so that skills, not connections, decide success.
               </p>
             </div>
             
@@ -188,8 +188,15 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border/50 bg-muted/30">
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center text-sm text-muted-foreground">
-            <p>© 2024 Smart Internship Allocation System. Built with modern web technologies.</p>
+          <div className="text-center space-y-4">
+            <div>
+              <h3 className="font-semibold text-lg mb-2">Optima — Where Talent Meets Opportunity</h3>
+              <p className="text-sm text-muted-foreground">
+                📖 <strong>About Us (SIH 2025):</strong>
+                <br />
+                As SIH 2025 innovators, we present Optima, a smart allocation platform that bridges the gap between student talent and real-world opportunities. By leveraging AI-driven matching, we make internships fair, accessible, and future-ready, so that skills, not connections, decide success.
+              </p>
+            </div>
           </div>
         </div>
       </footer>

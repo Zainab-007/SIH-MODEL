@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Portal - Optima</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: 221 83% 53%;
+      --primary-foreground: 0 0% 98%;
+      --background: 0 0% 100%;
+      --foreground: 222 15% 15%;
+      --secondary: 215 16% 47%;
+      --secondary-foreground: 0 0% 98%;
+      --surface: 220 13% 97%;
+      --border: 220 13% 91%;
+      --success: 142 76% 36%;
+      --destructive: 0 84% 60%;
+      --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.06);
+      --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -2px hsl(0 0% 0% / 0.05);
+      --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%), hsl(221 83% 35%));
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: hsl(var(--surface));
+      color: hsl(var(--foreground));
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: hsl(var(--background));
+      border-bottom: 1px solid hsl(var(--border));
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-md);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-button {
+      padding: 0.5rem 1rem;
+      background: var(--gradient-primary);
+      color: hsl(var(--primary-foreground));
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .nav-button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: hsl(var(--foreground));
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: hsl(var(--secondary));
+    }
+
+    .form-card {
+      background: hsl(var(--background));
+      border: 1px solid hsl(var(--border));
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      animation: fadeInUp 0.6s ease-out 0.2s forwards;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: hsl(var(--foreground));
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: hsl(var(--foreground));
+    }
+
+    .required {
+      color: hsl(var(--destructive));
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.875rem;
+      font-size: 1rem;
+      border: 1px solid hsl(var(--border));
+      border-radius: 8px;
+      background: hsl(var(--background));
+      color: hsl(var(--foreground));
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 0.95rem;
+      border: 2px dashed hsl(var(--border));
+      border-radius: 8px;
+      background: hsl(var(--surface) / 0.3);
+      color: hsl(var(--foreground));
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: hsl(var(--primary));
+      box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+    }
+
+    input[type="file"]:hover {
+      border-color: hsl(var(--primary));
+      background: hsl(var(--primary) / 0.05);
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .submit-button {
+      width: 100%;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      background: var(--gradient-primary);
+      color: hsl(var(--primary-foreground));
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .submit-button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .submit-button:active {
+      transform: translateY(0);
+    }
+
+    .submit-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .help-text {
+      font-size: 0.875rem;
+      color: hsl(var(--secondary));
+      margin-top: 0.25rem;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .msg {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-align: center;
+      transition: all 0.3s ease;
+      display: none;
+    }
+
+    .msg.success {
+      background: hsl(var(--success) / 0.1);
+      color: hsl(var(--success));
+      border: 1px solid hsl(var(--success) / 0.2);
+      display: block;
+    }
+
+    .msg.error {
+      background: hsl(var(--destructive) / 0.1);
+      color: hsl(var(--destructive));
+      border: 1px solid hsl(var(--destructive) / 0.2);
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 1rem;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+
+      .page-title {
+        font-size: 2rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .form-card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">🎓 Optima</div>
+    <a href="doe.html" class="nav-button">← Back to Home</a>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">Student Portal</h1>
+      <p class="page-subtitle">Create your profile and apply for exciting internship opportunities</p>
+    </div>
+
+    <div class="form-card">
+      <h2 class="section-title">
+        <span>📋</span>
+        Application Form
+      </h2>
+
+      <form id="studentForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">First Name <span class="required">*</span></label>
+            <input type="text" id="firstName" name="firstName" required>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name <span class="required">*</span></label>
+            <input type="text" id="lastName" name="lastName" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address <span class="required">*</span></label>
+          <input type="email" id="email" name="email" required>
+          <div class="help-text">We'll use this to contact you about your application</div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" name="phone">
+          </div>
+          <div class="form-group">
+            <label for="university">University/College</label>
+            <input type="text" id="university" name="university">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="skills">Skills & Technologies <span class="required">*</span></label>
+          <textarea 
+            id="skills" 
+            name="skills" 
+            placeholder="e.g., JavaScript, React, Python, Machine Learning, Data Analysis..."
+            required
+          ></textarea>
+          <div class="help-text">List your technical skills, programming languages, and tools</div>
+        </div>
+
+        <div class="form-group">
+          <label for="experience">Experience & Projects</label>
+          <textarea 
+            id="experience" 
+            name="experience" 
+            placeholder="Describe your relevant experience, projects, hackathons, etc."
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="interests">Areas of Interest</label>
+          <select id="interests" name="interests">
+            <option value="">Select your preferred field</option>
+            <option value="web-development">Web Development</option>
+            <option value="mobile-development">Mobile App Development</option>
+            <option value="data-science">Data Science & Analytics</option>
+            <option value="ai-ml">Artificial Intelligence & ML</option>
+            <option value="cybersecurity">Cybersecurity</option>
+            <option value="cloud-computing">Cloud Computing</option>
+            <option value="ui-ux">UI/UX Design</option>
+            <option value="blockchain">Blockchain</option>
+            <option value="iot">Internet of Things (IoT)</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="resume">Resume/CV <span class="required">*</span></label>
+          <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" required>
+          <div class="help-text">Upload your resume in PDF, DOC, or DOCX format (Max 5MB)</div>
+        </div>
+
+        <button type="submit" class="submit-button" id="submitBtn">
+          <span id="submitText">Submit Application</span>
+          <div id="submitSpinner" class="spinner" style="display: none;"></div>
+        </button>
+
+        <div class="msg" id="msg"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- About Us Section -->
+  <div class="container">
+    <div class="content-card" style="margin-top: 2rem;">
+      <h2 class="section-title">Optima — Where Talent Meets Opportunity</h2>
+      <p style="font-weight: 600; color: hsl(var(--primary)); margin-bottom: 1rem;">📖 About Us (SIH 2025):</p>
+      <p style="color: hsl(var(--secondary)); line-height: 1.7;">
+        As SIH 2025 innovators, we present Optima, a smart allocation platform that bridges the gap between student talent and real-world opportunities. By leveraging AI-driven matching, we make internships fair, accessible, and future-ready, so that skills, not connections, decide success.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('studentForm');
+    const msg = document.getElementById('msg');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitText = document.getElementById('submitText');
+    const submitSpinner = document.getElementById('submitSpinner');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Show loading state
+      submitBtn.disabled = true;
+      submitText.textContent = 'Submitting...';
+      submitSpinner.style.display = 'block';
+
+      // Simulate form submission
+      try {
+        // Collect form data
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Show success message
+        msg.className = 'msg success';
+        msg.textContent = '✅ Application submitted successfully! We will review your profile and get back to you soon.';
+        
+        submitText.textContent = 'Submitted!';
+        
+        // Reset form after success
+        setTimeout(() => {
+          form.reset();
+          resetButton();
+          msg.style.display = 'none';
+        }, 3000);
+
+      } catch (error) {
+        // Show error message
+        msg.className = 'msg error';
+        msg.textContent = '❌ Something went wrong. Please try again.';
+        resetButton();
+      }
+    });
+
+    function resetButton() {
+      submitBtn.disabled = false;
+      submitText.textContent = 'Submit Application';
+      submitSpinner.style.display = 'none';
+    }
+
+    // File upload validation
+    document.getElementById('resume').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        // Check file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+          msg.className = 'msg error';
+          msg.textContent = '❌ File size too large. Please upload a file smaller than 5MB.';
+          e.target.value = '';
+          return;
+        }
+
+        // Check file type
+        const allowedTypes = ['.pdf', '.doc', '.docx'];
+        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+        if (!allowedTypes.includes(fileExtension)) {
+          msg.className = 'msg error';
+          msg.textContent = '❌ Invalid file type. Please upload a PDF, DOC, or DOCX file.';
+          e.target.value = '';
+          return;
+        }
+
+        // Clear any previous error messages
+        if (msg.classList.contains('error')) {
+          msg.style.display = 'none';
+        }
+      }
+    });
+  </script>
+</body>
+</html>
