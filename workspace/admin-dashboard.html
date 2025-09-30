@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Admin Dashboard - Smart Internship Allocation</title>
+    <title>Admin Dashboard - Optima</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,442 +26,345 @@
         --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%), hsl(221 83% 35%));
       }
 
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
 
       body {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         background: hsl(var(--surface));
         color: hsl(var(--foreground));
-        line-height: 1.5;
-        min-height: 100vh;
+        line-height: 1.5; min-height: 100vh;
       }
 
-      .navbar {
-        background: hsl(var(--background));
-        border-bottom: 1px solid hsl(var(--border));
-        box-shadow: var(--shadow-sm);
-        padding: 1rem 2rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-      }
+      .navbar { background: hsl(var(--background)); border-bottom: 1px solid hsl(var(--border)); box-shadow: var(--shadow-sm); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+      .navbar-brand { display: flex; align-items: center; gap: 0.75rem; font-size: 1.25rem; font-weight: 700; color: hsl(var(--foreground)); }
+      .navbar-icon { width: 40px; height: 40px; background: var(--gradient-primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; }
+      .navbar-actions { display: flex; gap: 0.75rem; align-items: center; }
 
-      .navbar-brand {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: hsl(var(--foreground));
-      }
+      .btn { padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; font-family: inherit; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+      .btn-primary { background: var(--gradient-primary); color: hsl(var(--primary-foreground)); }
+      .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+      .btn-secondary { background: hsl(var(--background)); color: hsl(var(--secondary)); border: 1px solid hsl(var(--border)); }
+      .btn-secondary:hover { background: hsl(var(--surface)); border-color: hsl(var(--secondary)); }
 
-      .navbar-icon {
-        width: 40px;
-        height: 40px;
-        background: var(--gradient-primary);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 18px;
-      }
+      .container { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+      .grid { display: grid; gap: 1rem; }
+      .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      @media (max-width: 900px) { .grid-3 { grid-template-columns: 1fr; } }
 
-      .navbar-actions {
-        display: flex;
-        gap: 0.75rem;
-        align-items: center;
-      }
+      .card { background: hsl(var(--background)); border: 1px solid hsl(var(--border)); border-radius: 12px; box-shadow: var(--shadow-sm); overflow: hidden; }
+      .card-header { padding: 1rem 1.25rem; border-bottom: 1px solid hsl(var(--border)); display: flex; justify-content: space-between; align-items: center; }
+      .card-title { font-size: 1rem; font-weight: 600; color: hsl(var(--foreground)); }
+      .card-content { padding: 1rem 1.25rem; }
 
-      .btn {
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-family: inherit;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        text-decoration: none;
-      }
+      .stat { display: flex; align-items: center; gap: 0.75rem; }
+      .stat .icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; }
+      .icon-students { background: hsl(221 83% 53%); }
+      .icon-internships { background: hsl(215 16% 47%); }
+      .icon-allocations { background: hsl(45 93% 47%); }
+      .stat .value { font-size: 1.5rem; font-weight: 700; }
+      .stat .label { color: hsl(var(--secondary)); font-size: 0.875rem; }
 
-      .btn-primary {
-        background: var(--gradient-primary);
-        color: hsl(var(--primary-foreground));
-      }
+      .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid hsl(var(--border)); }
+      table { width: 100%; border-collapse: collapse; background: hsl(var(--background)); }
+      th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid hsl(var(--border)); font-size: 0.9rem; }
+      th { background: hsl(var(--surface)); font-weight: 600; color: hsl(var(--foreground)); }
 
-      .btn-primary:hover {
-        opacity: 0.9;
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
-      }
-
-      .btn-secondary {
-        background: hsl(var(--background));
-        color: hsl(var(--secondary));
-        border: 1px solid hsl(var(--border));
-      }
-
-      .btn-secondary:hover {
-        background: hsl(var(--surface));
-        border-color: hsl(var(--secondary));
-      }
-
-      .main-content {
-        padding: 2rem;
-        max-width: 1200px;
-        margin: 0 auto;
-      }
-
-      .page-header {
-        margin-bottom: 2rem;
-      }
-
-      .page-title {
-        font-size: 2rem;
-        font-weight: 700;
-        color: hsl(var(--foreground));
-        margin-bottom: 0.5rem;
-      }
-
-      .page-subtitle {
-        color: hsl(var(--secondary));
-        font-size: 1rem;
-      }
-
-      .card {
-        background: hsl(var(--background));
-        border: 1px solid hsl(var(--border));
-        border-radius: 12px;
-        box-shadow: var(--shadow-sm);
-        overflow: hidden;
-      }
-
-      .card-header {
-        padding: 1.5rem;
-        border-bottom: 1px solid hsl(var(--border));
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .card-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: hsl(var(--foreground));
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .card-content {
-        padding: 1.5rem;
-      }
-
-      .table-container {
-        overflow-x: auto;
-        border-radius: 8px;
-        border: 1px solid hsl(var(--border));
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        background: hsl(var(--background));
-      }
-
-      th, td {
-        padding: 0.875rem;
-        text-align: left;
-        border-bottom: 1px solid hsl(var(--border));
-      }
-
-      th {
-        background: hsl(var(--surface));
-        font-weight: 600;
-        color: hsl(var(--foreground));
-        font-size: 0.875rem;
-        text-transform: uppercase;
-        letter-spacing: 0.025em;
-      }
-
-      td {
-        color: hsl(var(--foreground));
-        font-size: 0.875rem;
-      }
-
-      tr:last-child td {
-        border-bottom: none;
-      }
-
-      tr:hover {
-        background: hsl(var(--surface) / 0.5);
-      }
-
-      .status-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        font-size: 12px;
-        margin-right: 0.5rem;
-      }
-
-      .status-allocated {
-        background: hsl(var(--success) / 0.1);
-        color: hsl(var(--success));
-      }
-
-      .status-pending {
-        background: hsl(var(--warning) / 0.1);
-        color: hsl(var(--warning));
-      }
-
-      .loading-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 3rem;
-        text-align: center;
-      }
-
-      .spinner {
-        width: 32px;
-        height: 32px;
-        border: 3px solid hsl(var(--border));
-        border-top: 3px solid hsl(var(--primary));
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-bottom: 1rem;
-      }
-
-      .empty-state {
-        text-align: center;
-        padding: 3rem;
-        color: hsl(var(--secondary));
-      }
-
-      .empty-state-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-      }
-
-      @keyframes spin {
-        to { transform: rotate(360deg); }
-      }
-
-      @media (max-width: 768px) {
-        .navbar {
-          padding: 1rem;
-        }
-        
-        .navbar-brand {
-          font-size: 1.125rem;
-        }
-        
-        .main-content {
-          padding: 1rem;
-        }
-        
-        .page-title {
-          font-size: 1.5rem;
-        }
-        
-        .card-header {
-          padding: 1rem;
-          flex-direction: column;
-          gap: 1rem;
-          align-items: flex-start;
-        }
-        
-        .navbar-actions {
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-        
-        .btn {
-          padding: 0.5rem 0.75rem;
-          font-size: 0.8rem;
-        }
-      }
+      .loading, .error, .empty { padding: 1rem; text-align: center; color: hsl(var(--secondary)); }
+      .spinner { width: 18px; height: 18px; border: 2px solid hsl(var(--border)); border-top-color: hsl(var(--primary)); border-radius: 50%; display: inline-block; animation: spin 1s linear infinite; }
+      @keyframes spin { to { transform: rotate(360deg); } }
     </style>
   </head>
   <body>
     <nav class="navbar">
       <div class="navbar-brand">
-        <div class="navbar-icon">🏛️</div>
-        <div>
-          <div>Smart Internship Allocation</div>
-          <div style="font-size: 0.75rem; font-weight: 400; color: hsl(var(--secondary));">Admin Dashboard</div>
-        </div>
+        <div class="navbar-icon">🛡️</div>
+        <span>Optima Admin</span>
       </div>
       <div class="navbar-actions">
-        <button class="btn btn-primary" id="refresh">
-          🔄 Load Allocations
-        </button>
-        <button class="btn btn-secondary" id="logout">
-          🚪 Logout
-        </button>
+        <a class="btn btn-secondary" href="/admin">Switch Account</a>
+        <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+        <!-- <a class="btn btn-primary" href="http://localhost:5173" target="_blank">Main App</a> -->
       </div>
     </nav>
 
-    <main class="main-content">
-      <div class="page-header">
-        <h1 class="page-title">Allocation Results</h1>
-        <p class="page-subtitle">View and manage internship allocations</p>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            📊 Allocation Data
+    <div class="container">
+      <div class="grid grid-3" id="stats">
+        <div class="card">
+          <div class="card-content stat">
+            <div class="icon icon-students">🎓</div>
+            <div>
+              <div class="value" id="totalStudents">-</div>
+              <div class="label">Students</div>
+            </div>
           </div>
         </div>
-        <div class="card-content">
-          <div id="out">Click "Load Allocations" to fetch results.</div>
+        <div class="card">
+          <div class="card-content stat">
+            <div class="icon icon-internships">🏢</div>
+            <div>
+              <div class="value" id="totalInternships">-</div>
+              <div class="label">Internships</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-content stat">
+            <div class="icon icon-allocations">🏆</div>
+            <div>
+              <div class="value" id="totalAllocations">-</div>
+              <div class="label">Allocations</div>
+            </div>
+          </div>
         </div>
       </div>
-    </main>
+
+      <div class="card" style="margin-top: 1rem;">
+        <div class="card-header">
+          <div class="card-title">Admin Actions</div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button id="populateDataBtn" class="btn btn-secondary">
+              <span id="populateText">Add Sample Data</span>
+              <span id="populateSpinner" class="spinner" style="display:none;"></span>
+            </button>
+            <button id="runAllocationBtn" class="btn btn-primary">
+              <span id="runText">Run Allocation</span>
+              <span id="runSpinner" class="spinner" style="display:none;"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid" style="margin-top: 1rem; gap: 1rem;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Students</div>
+          </div>
+          <div class="card-content">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Category</th>
+                  </tr>
+                </thead>
+                <tbody id="studentsBody">
+                  <tr><td colspan="4" class="loading">Loading students...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Companies / Internships</div>
+          </div>
+          <div class="card-content">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Organization</th>
+                    <th>Sector</th>
+                    <th>Seats</th>
+                  </tr>
+                </thead>
+                <tbody id="internshipsBody">
+                  <tr><td colspan="4" class="loading">Loading internships...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Allocations</div>
+          </div>
+          <div class="card-content">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Student</th>
+                    <th>Organization</th>
+                    <th>Sector</th>
+                    <th>Score</th>
+                    <th>Type</th>
+                  </tr>
+                </thead>
+                <tbody id="allocationsBody">
+                  <tr><td colspan="6" class="loading">Loading allocations...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script>
-      const out = document.getElementById('out');
-      
-      // Show initial state
-      showEmptyState();
-      
-      document.getElementById('refresh').addEventListener('click', async () => {
-        showLoadingState();
+      async function api(path, options = {}) {
+        const res = await fetch(path, {
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          ...options
+        });
+        if (res.status === 401) {
+          alert('Session expired or unauthorized. Please login again.');
+          window.location.href = '/admin';
+          return null;
+        }
+        try { return await res.json(); } catch { return null; }
+      }
+
+      async function loadDashboard() {
+        const data = await api('/admin_dashboard_data');
+        if (!data) return;
+        document.getElementById('totalStudents').textContent = data.stats.total_students;
+        document.getElementById('totalInternships').textContent = data.stats.total_internships;
+        document.getElementById('totalAllocations').textContent = data.stats.total_allocations;
+      }
+
+      async function loadStudents() {
+        const data = await api('/get_students');
+        const body = document.getElementById('studentsBody');
+        if (!data) return;
+        if (!data.students || data.students.length === 0) {
+          body.innerHTML = '<tr><td colspan="4" class="empty">No students found</td></tr>';
+          return;
+        }
+        body.innerHTML = data.students.map(s => `
+          <tr>
+            <td>${s.id}</td>
+            <td>${s.name || '-'}</td>
+            <td>${s.email || '-'}</td>
+            <td>${s.category || '-'}</td>
+          </tr>
+        `).join('');
+      }
+
+      async function loadInternships() {
+        const data = await api('/get_internships');
+        const body = document.getElementById('internshipsBody');
+        if (!data) return;
+        if (!data.internships || data.internships.length === 0) {
+          body.innerHTML = '<tr><td colspan="4" class="empty">No internships found</td></tr>';
+          return;
+        }
+        body.innerHTML = data.internships.map(i => `
+          <tr>
+            <td>${i.id}</td>
+            <td>${i.org_name || i.company || '-'}</td>
+            <td>${i.sector || '-'}</td>
+            <td>${i.seats || '-'}</td>
+          </tr>
+        `).join('');
+      }
+
+      async function loadAllocations() {
+        const data = await api('/get_allocations');
+        const body = document.getElementById('allocationsBody');
+        if (!data) return;
+        if (!data.allocations || data.allocations.length === 0) {
+          body.innerHTML = '<tr><td colspan="6" class="empty">No allocations found</td></tr>';
+          return;
+        }
+        body.innerHTML = data.allocations.map(a => `
+          <tr>
+            <td>${a.id}</td>
+            <td>${a.student_name || '-'}</td>
+            <td>${a.internship_org || '-'}</td>
+            <td>${a.sector || '-'}</td>
+            <td>${a.score?.toFixed ? a.score.toFixed(1) : a.score}</td>
+            <td>${a.allocation_type || '-'}</td>
+          </tr>
+        `).join('');
+      }
+
+      async function runAllocation() {
+        const btn = document.getElementById('runAllocationBtn');
+        const text = document.getElementById('runText');
+        const spinner = document.getElementById('runSpinner');
+        
+        btn.disabled = true; 
+        spinner.style.display = 'inline-block'; 
+        text.textContent = 'Running...';
         
         try {
-          const res = await fetch('/allocations', { credentials: 'same-origin' });
-          const data = await res.json();
+          const res = await api('/run_allocation', { method: 'POST', body: JSON.stringify({}) });
           
-          if (!res.ok) {
-            showErrorState((data && (data.message || data.error)) || 'Unauthorized');
-            return;
+          if (res && res.message) {
+            await Promise.all([loadDashboard(), loadAllocations()]);
+            alert(`✅ ${res.message}\n\nAllocated ${res.allocations ? res.allocations.length : 0} students to internships.`);
+          } else if (res && res.error) {
+            alert(`❌ Error: ${res.error}\n${res.message || ''}`);
+          } else {
+            alert('❌ Allocation failed. Please check if you have students and internships data.');
           }
+        } catch (error) {
+          console.error('Allocation error:', error);
+          alert('❌ Network error during allocation. Please try again.');
+        } finally {
+          btn.disabled = false; 
+          spinner.style.display = 'none'; 
+          text.textContent = 'Run Allocation';
+        }
+      }
+
+      async function populateSampleData() {
+        const btn = document.getElementById('populateDataBtn');
+        const text = document.getElementById('populateText');
+        const spinner = document.getElementById('populateSpinner');
+        
+        btn.disabled = true; 
+        spinner.style.display = 'inline-block'; 
+        text.textContent = 'Adding...';
+        
+        try {
+          const res = await api('/populate_sample_data', { method: 'POST', body: JSON.stringify({}) });
           
-          displayAllocations(data);
-        } catch (e) {
-          showErrorState('Network error. Please check your connection and try again.');
+          if (res && res.message) {
+            await Promise.all([loadDashboard(), loadStudents(), loadInternships()]);
+            alert(`✅ ${res.message}\n\nAdded ${res.students_added} students and ${res.internships_added} internships.`);
+          } else if (res && res.error) {
+            alert(`❌ Error: ${res.error}\n${res.message || ''}`);
+          } else {
+            alert('❌ Failed to add sample data.');
+          }
+        } catch (error) {
+          console.error('Populate data error:', error);
+          alert('❌ Network error. Please try again.');
+        } finally {
+          btn.disabled = false; 
+          spinner.style.display = 'none'; 
+          text.textContent = 'Add Sample Data';
+        }
+      }
+
+      document.getElementById('populateDataBtn').addEventListener('click', populateSampleData);
+      document.getElementById('runAllocationBtn').addEventListener('click', runAllocation);
+      document.getElementById('logoutBtn').addEventListener('click', async () => {
+        try {
+          await api('/admin_logout', { method: 'POST' });
+          alert('Logged out successfully');
+          window.location.href = '/admin';
+        } catch (error) {
+          console.error('Logout error:', error);
+          window.location.href = '/admin';
         }
       });
-      
-      document.getElementById('logout').addEventListener('click', async () => {
-        await fetch('/admin_logout', { method: 'POST', credentials: 'same-origin' });
-        window.location.href = '/static/admin_login.html';
-      });
-      
-      function showLoadingState() {
-        out.innerHTML = `
-          <div class="loading-state">
-            <div class="spinner"></div>
-            <div style="font-weight: 500; margin-bottom: 0.5rem;">Loading allocations...</div>
-            <div style="color: hsl(var(--secondary)); font-size: 0.875rem;">Please wait while we fetch the latest data</div>
-          </div>
-        `;
-      }
-      
-      function showEmptyState() {
-        out.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">📋</div>
-            <div style="font-weight: 500; margin-bottom: 0.5rem;">No allocation data</div>
-            <div style="color: hsl(var(--secondary)); font-size: 0.875rem;">Click "Load Allocations" to fetch the latest results</div>
-          </div>
-        `;
-      }
-      
-      function showErrorState(message) {
-        out.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">⚠️</div>
-            <div style="font-weight: 500; margin-bottom: 0.5rem; color: hsl(var(--destructive));">Error Loading Data</div>
-            <div style="color: hsl(var(--secondary)); font-size: 0.875rem;">${message}</div>
-          </div>
-        `;
-      }
-      
-      function displayAllocations(data) {
-        if (!data || (Array.isArray(data) && data.length === 0)) {
-          showEmptyState();
-          return;
-        }
-        
-        // Handle both array and object responses
-        let allocations = Array.isArray(data) ? data : [data];
-        
-        // If data has a nested structure, try to extract allocations
-        if (data.allocations) {
-          allocations = Array.isArray(data.allocations) ? data.allocations : [data.allocations];
-        }
-        
-        // If it's still just a raw JSON object/string, show it in a formatted way
-        if (typeof data === 'object' && !Array.isArray(data) && !data.allocations) {
-          out.innerHTML = `
-            <div class="table-container">
-              <pre style="background: hsl(var(--surface)); padding: 1rem; border-radius: 8px; overflow: auto; white-space: pre-wrap; font-size: 0.875rem;">${JSON.stringify(data, null, 2)}</pre>
-            </div>
-          `;
-          return;
-        }
-        
-        let tableHTML = `
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>👤 Student</th>
-                  <th>🏢 Internship</th>
-                  <th>🏭 Sector</th>
-                  <th>📊 Score</th>
-                  <th>💡 Reason</th>
-                  <th>✅ Status</th>
-                </tr>
-              </thead>
-              <tbody>
-        `;
-        
-        allocations.forEach(allocation => {
-          const isAllocated = allocation.internship || allocation.internship_name || allocation.allocated;
-          const statusIcon = isAllocated ? 
-            '<span class="status-icon status-allocated">✅</span>Allocated' : 
-            '<span class="status-icon status-pending">⚠️</span>Pending';
-          
-          tableHTML += `
-            <tr>
-              <td>${allocation.student || allocation.student_name || 'N/A'}</td>
-              <td>${allocation.internship || allocation.internship_name || 'Not Assigned'}</td>
-              <td>${allocation.sector || allocation.sector_name || 'N/A'}</td>
-              <td>${allocation.score || allocation.match_score || 'N/A'}</td>
-              <td>${allocation.reason || allocation.allocation_reason || 'N/A'}</td>
-              <td>${statusIcon}</td>
-            </tr>
-          `;
-        });
-        
-        tableHTML += `
-              </tbody>
-            </table>
-          </div>
-        `;
-        
-        out.innerHTML = tableHTML;
-      }
+
+      // Initial loads
+      loadDashboard();
+      loadStudents();
+      loadInternships();
+      loadAllocations();
     </script>
   </body>
 </html>
