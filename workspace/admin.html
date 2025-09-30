@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Admin Login - Smart Internship Allocation</title>
+    <title>Admin Login - Optima</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -218,11 +218,29 @@
     <div class="login-container">
       <div class="logo-section">
         <div class="logo-icon">🏛️</div>
-        <h1>Admin Login</h1>
+        <h1>Portal Login</h1>
         <p class="subtitle">Smart Internship Allocation System</p>
       </div>
       
       <form id="loginForm">
+        <div class="input-group">
+          <label style="font-weight: 600; margin-bottom: 0.5rem; display: block; color: hsl(var(--foreground));">Login as:</label>
+          <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="radio" name="userType" value="admin" checked />
+              <span>Admin</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="radio" name="userType" value="student" />
+              <span>Student</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="radio" name="userType" value="company" />
+              <span>Company</span>
+            </label>
+          </div>
+        </div>
+        
         <div class="input-group">
           <div class="input-icon">📧</div>
           <input type="email" id="email" placeholder="Enter your email" required />
@@ -263,13 +281,18 @@
         
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
+        const userType = document.querySelector('input[name="userType"]:checked').value;
         
         try {
-          const res = await fetch('/admin_login', {
+          let endpoint = '/admin_login';
+          if (userType === 'student') endpoint = '/student_login';
+          if (userType === 'company') endpoint = '/company_login';
+          
+          const res = await fetch(endpoint, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             credentials: 'same-origin',
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password, userType })
           });
           const data = await res.json();
           
@@ -279,7 +302,13 @@
             loginText.textContent = 'Success!';
             
             setTimeout(() => {
-              window.location.href = '/static/admin-dashboard.html';
+              if (userType === 'admin') {
+                window.location.href = '/admin-dashboard';
+              } else if (userType === 'student') {
+                window.location.href = '/student-dashboard';
+              } else if (userType === 'company') {
+                window.location.href = '/company-dashboard';
+              }
             }, 1500);
           } else {
             msg.className = 'msg error';

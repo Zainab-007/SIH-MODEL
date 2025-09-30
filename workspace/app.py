@@ -78,6 +78,111 @@ def create_app():
         except Exception as e:
             print(f"Debug DB error: {e}")
             return jsonify({"error": str(e)}), 500
+    
+    @app.route("/test_allocation_insert", methods=["POST"])
+    def test_allocation_insert():
+        if not session.get("logged_in"):
+            return jsonify({"message": "Unauthorized"}), 401
+        
+        try:
+            supabase = get_supabase()
+            
+            # Get first student and internship for testing
+            students = supabase.table("students").select("*").limit(1).execute()
+            internships = supabase.table("internships").select("*").limit(1).execute()
+            
+            if not students.data or not internships.data:
+                return jsonify({"error": "Need at least one student and one internship to test"}), 400
+            
+            # Test inserting with correct format
+            test_record = {
+                "student_id": str(students.data[0]["id"]),
+                "internship_id": str(internships.data[0]["id"]),
+                "score": 85.5,
+                "reason": "test - test allocation"
+            }
+            
+            print(f"Testing allocation insert: {test_record}")
+            result = supabase.table("allocations").insert([test_record]).execute()
+            print(f"Insert result: {result.data}")
+            
+            # Verify it was inserted
+            all_allocations = supabase.table("allocations").select("*").execute()
+            print(f"Total allocations after test insert: {len(all_allocations.data)}")
+            print(f"All allocations data: {all_allocations.data}")
+            
+            return jsonify({
+                "message": "Test allocation inserted",
+                "inserted_data": result.data,
+                "total_allocations": len(all_allocations.data),
+                "all_allocations": all_allocations.data
+            })
+        except Exception as e:
+            print(f"Test insert error: {e}")
+            return jsonify({"error": str(e)}), 500
+    
+    @app.route("/raw_allocations", methods=["GET"])
+    def raw_allocations():
+        if not session.get("logged_in"):
+            return jsonify({"message": "Unauthorized"}), 401
+        
+        try:
+            supabase = get_supabase()
+            
+            # Get raw allocations data
+            allocations = supabase.table("allocations").select("*").execute()
+            print(f"=== RAW ALLOCATIONS CHECK ===")
+            print(f"Raw response: {allocations}")
+            print(f"Raw data: {allocations.data}")
+            print(f"Data type: {type(allocations.data)}")
+            print(f"Data length: {len(allocations.data) if allocations.data else 'None'}")
+            
+            return jsonify({
+                "raw_response": str(allocations),
+                "data": allocations.data,
+                "count": len(allocations.data) if allocations.data else 0
+            })
+        except Exception as e:
+            print(f"Raw allocations error: {e}")
+            return jsonify({"error": str(e)}), 500
+    
+    @app.route("/test_simple_insert", methods=["POST"])
+    def test_simple_insert():
+        if not session.get("logged_in"):
+            return jsonify({"message": "Unauthorized"}), 401
+        
+        try:
+            supabase = get_supabase()
+            
+            # Get first student and internship to use their actual UUIDs
+            students = supabase.table("students").select("*").limit(1).execute()
+            internships = supabase.table("internships").select("*").limit(1).execute()
+            
+            if not students.data or not internships.data:
+                return jsonify({"error": "Need at least one student and one internship to test"}), 400
+            
+            # Test with correct UUID format
+            minimal_record = {
+                "student_id": str(students.data[0]["id"]),
+                "internship_id": str(internships.data[0]["id"]),
+                "score": 50.0,
+                "reason": "Test allocation"
+            }
+            
+            print(f"=== TESTING MINIMAL INSERT ===")
+            print(f"Minimal record: {minimal_record}")
+            
+            result = supabase.table("allocations").insert([minimal_record]).execute()
+            print(f"Minimal insert result: {result.data}")
+            
+            return jsonify({
+                "message": "Minimal insert test",
+                "result": result.data,
+                "success": len(result.data) > 0 if result.data else False
+            })
+        except Exception as e:
+            print(f"Minimal insert error: {e}")
+            return jsonify({"error": str(e)}), 500
 
     @app.route("/admin_login", methods=["POST"])
     def admin_login():
@@ -95,6 +200,7 @@ def create_app():
 
         if email == admin_email and password == admin_password:
             session["logged_in"] = True
+            session["user_type"] = "admin"
             session.permanent = True
             print("Login successful - session set")
             return jsonify({"message": "Login successful"}), 200
@@ -103,10 +209,110 @@ def create_app():
             print("Login failed - invalid credentials")
             return jsonify({"message": "Invalid credentials"}), 401
     
+    @app.route("/student_login", methods=["POST"])
+    def student_login():
+        print("Student login attempt received")
+        data = request.get_json(silent=True) or {}
+        email = str(data.get("email") or "").strip()
+        password = str(data.get("password") or "")
+        
+        print(f"Student login attempt - Email: {email}")
+        
+        try:
+            supabase = get_supabase()
+            
+            # Check if student exists in database - first get all students to see structure
+            all_students = supabase.table("students").select("*").execute()
+            print(f"All students data: {all_students.data}")
+            
+            if not all_students.data:
+                print("No students found in database")
+                return jsonify({"message": "No students in database"}), 401
+            
+            # Try to find student by email (if email field exists) or use first student for demo
+            student = None
+            for s in all_students.data:
+                print(f"Checking student: {s}")
+                if "email" in s and s["email"] == email:
+                    student = s
+                    break
+            
+            # If no email match, use first student for demo purposes
+            if not student and password == "student123":
+                student = all_students.data[0]
+                print(f"Using first student for demo: {student}")
+            
+            if student and password == "student123":  # Default password for demo
+                session["logged_in"] = True
+                session["user_type"] = "student"
+                session["user_id"] = student["id"]
+                session["user_name"] = student.get("name", "Student")
+                session.permanent = True
+                print(f"Student login successful: {student.get('name', 'Student')}")
+                return jsonify({"message": "Login successful", "user": student.get("name", "Student")}), 200
+            
+            print("Student login failed - invalid credentials")
+            return jsonify({"message": "Invalid credentials"}), 401
+        except Exception as e:
+            print(f"Student login error: {e}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({"message": "Login error", "error": str(e)}), 500
+    
+    @app.route("/company_login", methods=["POST"])
+    def company_login():
+        print("Company login attempt received")
+        data = request.get_json(silent=True) or {}
+        email = str(data.get("email") or "").strip()
+        password = str(data.get("password") or "")
+        
+        print(f"Company login attempt - Email: {email}")
+        
+        try:
+            supabase = get_supabase()
+            
+            # Check if company exists in internships table - first get all internships to see structure
+            all_internships = supabase.table("internships").select("*").execute()
+            print(f"All internships data: {all_internships.data}")
+            
+            if not all_internships.data:
+                print("No internships found in database")
+                return jsonify({"message": "No companies in database"}), 401
+            
+            # Try to find company by contact_email or use first internship for demo
+            company = None
+            for i in all_internships.data:
+                print(f"Checking internship: {i}")
+                if "contact_email" in i and i["contact_email"] == email:
+                    company = i
+                    break
+            
+            # If no email match, use first internship for demo purposes
+            if not company and password == "company123":
+                company = all_internships.data[0]
+                print(f"Using first internship for demo: {company}")
+            
+            if company and password == "company123":  # Default password for demo
+                session["logged_in"] = True
+                session["user_type"] = "company"
+                session["user_id"] = company["id"]
+                session["company_name"] = company.get("org_name", "Company")
+                session.permanent = True
+                print(f"Company login successful: {company.get('org_name', 'Company')}")
+                return jsonify({"message": "Login successful", "company": company.get("org_name", "Company")}), 200
+            
+            print("Company login failed - invalid credentials")
+            return jsonify({"message": "Invalid credentials"}), 401
+        except Exception as e:
+            print(f"Company login error: {e}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({"message": "Login error", "error": str(e)}), 500
+
     @app.route("/admin_logout", methods=["POST"])
     def admin_logout():
         session.clear()
-        print("Admin logged out - session cleared")
+        print("User logged out - session cleared")
         return jsonify({"message": "Logged out successfully"}), 200
 
     @app.route("/run_allocation", methods=["POST"])
@@ -135,45 +341,47 @@ def create_app():
             allocations = run_allocation(students_data, internships_data)
             print(f"Generated {len(allocations)} allocations")
 
-            # Clear existing allocations and insert new ones
-            print("Clearing existing allocations...")
-            try:
-                # First check what allocations exist
-                existing_allocations = supabase.table("allocations").select("*").execute()
-                print(f"Found {len(existing_allocations.data)} existing allocations before delete")
-                
-                # Try to delete all allocations
-                delete_result = supabase.table("allocations").delete().neq("id", 0).execute()
-                print(f"Delete operation completed")
-                
-                # Verify deletion
-                remaining_allocations = supabase.table("allocations").select("*").execute()
-                print(f"Found {len(remaining_allocations.data)} allocations after delete")
-            except Exception as delete_error:
-                print(f"Delete operation failed: {delete_error}")
-                # Continue anyway
+            # Skip clearing existing allocations for now - just insert new ones
+            print("Skipping delete operation - inserting new allocations...")
             
             if allocations:
-                allocation_records = [
-                    {
-                        "student_id": a['student_id'],
-                        "internship_id": a['internship_id'],
-                        "score": a['score'],
-                        "allocation_type": a['allocation_type'],
-                        "reason": a['reason']
-                    }
-                    for a in allocations
-                ]
+                # First get students and internships to map IDs to UUIDs
+                students_response = supabase.table("students").select("*").execute()
+                internships_response = supabase.table("internships").select("*").execute()
+                
+                students_dict = {s["id"]: s for s in students_response.data}
+                internships_dict = {i["id"]: i for i in internships_response.data}
+                
+                allocation_records = []
+                for a in allocations:
+                    student = students_dict.get(a['student_id'])
+                    internship = internships_dict.get(a['internship_id'])
+                    
+                    if student and internship:
+                        allocation_records.append({
+                            "student_id": str(student['id']),  # Ensure string format
+                            "internship_id": str(internship['id']),  # Ensure string format
+                            "score": float(a['score']),
+                            "reason": f"{a.get('allocation_type', 'unknown')} - {a.get('reason', '')}"
+                        })
+                    else:
+                        print(f"Warning: Could not find student {a['student_id']} or internship {a['internship_id']}")
+                
+                print(f"Formatted {len(allocation_records)} allocation records for database")
                 print(f"Inserting {len(allocation_records)} allocation records...")
                 print(f"Sample allocation record: {allocation_records[0] if allocation_records else 'None'}")
                 
-                insert_result = supabase.table("allocations").insert(allocation_records).execute()
-                print(f"Insert operation completed: {len(insert_result.data) if insert_result.data else 0} records inserted")
-                print(f"Insert result data: {insert_result.data}")
-                
-                # Verify insertion
-                final_allocations = supabase.table("allocations").select("*").execute()
-                print(f"Final verification: {len(final_allocations.data)} allocations in database")
+                try:
+                    insert_result = supabase.table("allocations").insert(allocation_records).execute()
+                    print(f"Insert operation completed: {len(insert_result.data) if insert_result.data else 0} records inserted")
+                    print(f"Insert result data: {insert_result.data}")
+                    
+                    # Verify insertion
+                    final_allocations = supabase.table("allocations").select("*").execute()
+                    print(f"Final verification: {len(final_allocations.data)} allocations in database")
+                except Exception as insert_error:
+                    print(f"Insert operation failed: {insert_error}")
+                    return jsonify({"error": "Failed to insert allocations", "message": str(insert_error)}), 500
             else:
                 print("No allocations to insert")
             
@@ -191,11 +399,12 @@ def create_app():
             
             # Fetch allocations first
             allocations_response = supabase.table("allocations").select("*").execute()
+            print(f"=== GET_ALLOCATIONS DEBUG ===")
             print(f"Raw allocations response: {allocations_response.data}")
             print(f"Found {len(allocations_response.data)} allocations")
             
             if not allocations_response.data:
-                print("No allocations found in database")
+                print("No allocations found in database - returning empty array")
                 return jsonify({"allocations": []}), 200
             
             # Fetch students and internships separately
@@ -224,6 +433,8 @@ def create_app():
                 })
             
             print(f"Returning {len(allocations_data)} formatted allocations")
+            print(f"Sample formatted allocation: {allocations_data[0] if allocations_data else 'None'}")
+            print(f"Final response: {{'allocations': allocations_data}}")
             return jsonify({"allocations": allocations_data}), 200
         except Exception as e:
             print(f"Error in get_allocations: {e}")
@@ -344,7 +555,7 @@ def create_app():
     
     @app.route("/admin-dashboard")
     def admin_dashboard_redirect():
-        if not session.get("logged_in"):
+        if not session.get("logged_in") or session.get("user_type") != "admin":
             print("Unauthorized access to admin dashboard - redirecting to login")
             return """
             <script>
@@ -355,134 +566,175 @@ def create_app():
         print("Authorized access to admin dashboard")
         return send_from_directory('.', 'admin-dashboard.html')
     
-    @app.route("/populate_sample_data", methods=["POST"])
-    def populate_sample_data():
-        if not session.get("logged_in"):
+    @app.route("/student-dashboard")
+    def student_dashboard_redirect():
+        if not session.get("logged_in") or session.get("user_type") != "student":
+            print("Unauthorized access to student dashboard - redirecting to login")
+            return """
+            <script>
+                alert('Please login first');
+                window.location.href = '/admin';
+            </script>
+            """
+        print("Authorized access to student dashboard")
+        return send_from_directory('.', 'student-dashboard.html')
+    
+    @app.route("/company-dashboard")
+    def company_dashboard_redirect():
+        if not session.get("logged_in") or session.get("user_type") != "company":
+            print("Unauthorized access to company dashboard - redirecting to login")
+            return """
+            <script>
+                alert('Please login first');
+                window.location.href = '/admin';
+            </script>
+            """
+        print("Authorized access to company dashboard")
+        return send_from_directory('.', 'company-dashboard.html')
+    
+    # Student API endpoints
+    @app.route("/student_profile", methods=["GET"])
+    def student_profile():
+        if not session.get("logged_in") or session.get("user_type") != "student":
             return jsonify({"message": "Unauthorized"}), 401
+        
+        try:
+            supabase = get_supabase()
+            student_id = session.get("user_id")
             
+            student_response = supabase.table("students").select("*").eq("id", student_id).execute()
+            if student_response.data:
+                return jsonify(student_response.data[0]), 200
+            return jsonify({"message": "Student not found"}), 404
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    @app.route("/available_internships", methods=["GET"])
+    def available_internships():
+        if not session.get("logged_in") or session.get("user_type") != "student":
+            return jsonify({"message": "Unauthorized"}), 401
+        
+        try:
+            supabase = get_supabase()
+            internships_response = supabase.table("internships").select("*").execute()
+            return jsonify({"internships": internships_response.data}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    @app.route("/my_applications", methods=["GET"])
+    def my_applications():
+        if not session.get("logged_in") or session.get("user_type") != "student":
+            return jsonify({"message": "Unauthorized"}), 401
+        
+        try:
+            supabase = get_supabase()
+            student_id = session.get("user_id")
+            
+            # For now, return empty array as we need to create applications table
+            return jsonify({"applications": []}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    @app.route("/apply_internship", methods=["POST"])
+    def apply_internship():
+        if not session.get("logged_in") or session.get("user_type") != "student":
+            return jsonify({"message": "Unauthorized"}), 401
+        
+        try:
+            data = request.get_json()
+            internship_id = data.get("internship_id")
+            student_id = session.get("user_id")
+            
+            # For now, just return success (need to implement applications table)
+            return jsonify({"message": "Application submitted successfully"}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    # Company API endpoints
+    @app.route("/company_profile", methods=["GET"])
+    def company_profile():
+        if not session.get("logged_in") or session.get("user_type") != "company":
+            return jsonify({"message": "Unauthorized"}), 401
+        
+        try:
+            company_name = session.get("company_name", "Company")
+            return jsonify({"name": company_name}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    @app.route("/company_internships", methods=["GET"])
+    def company_internships():
+        if not session.get("logged_in") or session.get("user_type") != "company":
+            return jsonify({"message": "Unauthorized"}), 401
+        
+        try:
+            supabase = get_supabase()
+            company_name = session.get("company_name")
+            
+            internships_response = supabase.table("internships").select("*").eq("org_name", company_name).execute()
+            return jsonify({"internships": internships_response.data}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    @app.route("/company_applications", methods=["GET"])
+    def company_applications():
+        if not session.get("logged_in") or session.get("user_type") != "company":
+            return jsonify({"message": "Unauthorized"}), 401
+        
+        try:
+            # For now, return empty array as we need to create applications table
+            return jsonify({"applications": []}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    @app.route("/create_internship", methods=["POST"])
+    def create_internship():
+        if not session.get("logged_in") or session.get("user_type") != "company":
+            return jsonify({"message": "Unauthorized"}), 401
+        
+        try:
+            supabase = get_supabase()
+            data = request.get_json()
+            
+            # Add company info to the internship data
+            internship_data = {
+                **data,
+                "company_id": session.get("user_id"),
+                "created_at": "now()"
+            }
+            
+            result = supabase.table("internships").insert([internship_data]).execute()
+            return jsonify({"message": "Internship created successfully", "data": result.data}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    @app.route("/internship/<internship_id>", methods=["GET", "PUT"])
+    def manage_internship(internship_id):
+        if not session.get("logged_in") or session.get("user_type") != "company":
+            return jsonify({"message": "Unauthorized"}), 401
+        
         try:
             supabase = get_supabase()
             
-            # Sample students data
-            sample_students = [
-                {
-                    "name": "Rahul Sharma",
-                    "email": "rahul.sharma@example.com",
-                    "marks": 85.5,
-                    "skills": "Python, Machine Learning, Data Analysis",
-                    "category": "GEN",
-                    "location_pref": "Mumbai",
-                    "sector_pref": "technology"
-                },
-                {
-                    "name": "Priya Patel",
-                    "email": "priya.patel@example.com", 
-                    "marks": 92.3,
-                    "skills": "Java, Spring Boot, React",
-                    "category": "OBC",
-                    "location_pref": "Bangalore",
-                    "sector_pref": "technology"
-                },
-                {
-                    "name": "Amit Kumar",
-                    "email": "amit.kumar@example.com",
-                    "marks": 78.9,
-                    "skills": "Finance, Excel, SQL",
-                    "category": "SC",
-                    "location_pref": "Delhi",
-                    "sector_pref": "finance"
-                },
-                {
-                    "name": "Sneha Reddy",
-                    "email": "sneha.reddy@example.com",
-                    "marks": 88.7,
-                    "skills": "Healthcare, Research, Biology",
-                    "category": "GEN",
-                    "location_pref": "Hyderabad",
-                    "sector_pref": "healthcare"
-                },
-                {
-                    "name": "Vikash Singh",
-                    "email": "vikash.singh@example.com",
-                    "marks": 81.2,
-                    "skills": "Marketing, Digital Marketing, Analytics",
-                    "category": "EWS",
-                    "location_pref": "Mumbai",
-                    "sector_pref": "marketing"
-                }
-            ]
+            if request.method == "GET":
+                result = supabase.table("internships").select("*").eq("id", internship_id).execute()
+                if result.data:
+                    return jsonify(result.data[0]), 200
+                return jsonify({"message": "Internship not found"}), 404
             
-            # Sample internships data
-            sample_internships = [
-                {
-                    "org_name": "TechCorp India",
-                    "company": "TechCorp India",
-                    "role": "Software Development Intern",
-                    "location": "Mumbai",
-                    "sector": "technology",
-                    "skills_required": "Python, React, JavaScript",
-                    "seats": 10,
-                    "quota_json": {
-                        "GEN": 4,
-                        "OBC": 3,
-                        "SC": 2,
-                        "ST": 1,
-                        "EWS": 0
-                    }
-                },
-                {
-                    "org_name": "FinanceHub Ltd",
-                    "company": "FinanceHub Ltd",
-                    "role": "Financial Analyst Intern", 
-                    "location": "Delhi",
-                    "sector": "finance",
-                    "skills_required": "Excel, SQL, Finance",
-                    "seats": 8,
-                    "quota_json": {
-                        "GEN": 3,
-                        "OBC": 2,
-                        "SC": 2,
-                        "ST": 1,
-                        "EWS": 0
-                    }
-                },
-                {
-                    "org_name": "HealthTech Solutions",
-                    "company": "HealthTech Solutions",
-                    "role": "Research Intern",
-                    "location": "Bangalore", 
-                    "sector": "healthcare",
-                    "skills_required": "Research, Biology, Healthcare",
-                    "seats": 6,
-                    "quota_json": {
-                        "GEN": 2,
-                        "OBC": 2,
-                        "SC": 1,
-                        "ST": 1,
-                        "EWS": 0
-                    }
-                }
-            ]
-            
-            # Insert sample data
-            students_result = supabase.table("students").insert(sample_students).execute()
-            internships_result = supabase.table("internships").insert(sample_internships).execute()
-            
-            return jsonify({
-                "message": "Sample data populated successfully",
-                "students_added": len(sample_students),
-                "internships_added": len(sample_internships)
-            }), 200
-            
+            elif request.method == "PUT":
+                data = request.get_json()
+                result = supabase.table("internships").update(data).eq("id", internship_id).execute()
+                return jsonify({"message": "Internship updated successfully"}), 200
+                
         except Exception as e:
-            return jsonify({"error": "Failed to populate data", "message": str(e)}), 500
-    
+            return jsonify({"error": str(e)}), 500
+
     @app.route("/static/<path:filename>")
     def static_files(filename):
         return send_from_directory('.', filename)
-
+    
     return app
-
 if __name__ == "__main__":
     app = create_app()
     app.run(debug=True)

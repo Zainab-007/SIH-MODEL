@@ -30,16 +30,34 @@ class HttpSupabaseTable:
             return HttpSupabaseResponse(data, response_count)
         except Exception as e:
             print(f"Error fetching from {self.table_name}: {e}")
+            print(f"Error type: {type(e)}")
+            print(f"URL was: {url}")
             return HttpSupabaseResponse([], 0)
     
     def insert(self, data):
         try:
             url = f"{self.base_url}/rest/v1/{self.table_name}"
+            print(f"INSERT URL: {url}")
+            print(f"INSERT DATA: {data}")
+            print(f"INSERT HEADERS: {self.headers}")
+            
             response = requests.post(url, headers=self.headers, json=data)
+            print(f"INSERT RESPONSE STATUS: {response.status_code}")
+            print(f"INSERT RESPONSE HEADERS: {dict(response.headers)}")
+            print(f"INSERT RESPONSE CONTENT: {response.text}")
+            
             response.raise_for_status()
-            return HttpSupabaseResponse(response.json() if response.content else [], None)
+            result_data = response.json() if response.content else []
+            print(f"INSERT RESULT DATA: {result_data}")
+            return HttpSupabaseResponse(result_data, None)
+        except requests.exceptions.HTTPError as e:
+            print(f"HTTP Error inserting into {self.table_name}: {e}")
+            print(f"Response status: {response.status_code}")
+            print(f"Response text: {response.text}")
+            return HttpSupabaseResponse([], None)
         except Exception as e:
             print(f"Error inserting into {self.table_name}: {e}")
+            print(f"Error type: {type(e)}")
             return HttpSupabaseResponse([], None)
     
     def delete(self):

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Dashboard - Internship Portal</title>
+    <style>
+      :root {
+        --primary: 221 83% 53%;
+        --secondary: 210 40% 98%;
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+        --surface: 210 40% 98%;
+        --border: 214.3 31.8% 91.4%;
+        --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%) 0%, hsl(221 83% 63%) 100%);
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: hsl(var(--background));
+        color: hsl(var(--foreground));
+        line-height: 1.5;
+      }
+
+      .navbar {
+        background: var(--gradient-primary);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: var(--shadow-md);
+      }
+
+      .navbar-brand {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .navbar-user {
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .btn-primary {
+        background: hsl(var(--primary));
+        color: white;
+      }
+
+      .btn-secondary {
+        background: white;
+        color: hsl(var(--primary));
+        border: 1px solid hsl(var(--border));
+      }
+
+      .btn-success {
+        background: #10b981;
+        color: white;
+      }
+
+      .btn-danger {
+        background: #ef4444;
+        color: white;
+      }
+
+      .btn:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .grid { display: grid; gap: 1.5rem; }
+      .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+      .card {
+        background: hsl(var(--background));
+        border: 1px solid hsl(var(--border));
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+      }
+
+      .card-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid hsl(var(--border));
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: hsl(var(--foreground));
+      }
+
+      .card-content { padding: 1.5rem; }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-card {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-label {
+        opacity: 0.9;
+        font-size: 0.875rem;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: hsl(var(--foreground));
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid hsl(var(--border));
+        border-radius: 6px;
+        font-size: 0.875rem;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: hsl(var(--primary));
+        box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+      }
+
+      .internship-card {
+        border: 1px solid hsl(var(--border));
+        border-radius: 8px;
+        padding: 1.5rem;
+        background: hsl(var(--surface));
+        margin-bottom: 1rem;
+      }
+
+      .internship-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+      }
+
+      .internship-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+
+      .internship-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin: 1rem 0;
+        font-size: 0.875rem;
+        color: #666;
+      }
+
+      .skill-tag {
+        display: inline-block;
+        background: hsl(var(--primary) / 0.1);
+        color: hsl(var(--primary));
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        margin: 0.25rem 0.25rem 0.25rem 0;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: white;
+        margin: 5% auto;
+        padding: 2rem;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .modal-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #666;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+      }
+
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid hsl(var(--border));
+        border-top-color: hsl(var(--primary));
+        border-radius: 50%;
+        display: inline-block;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .applicant-card {
+        border: 1px solid hsl(var(--border));
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: white;
+      }
+
+      .applicant-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+
+      .applicant-name {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+
+      .applicant-details {
+        font-size: 0.875rem;
+        color: #666;
+        margin-bottom: 1rem;
+      }
+
+      .applicant-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="navbar-brand">
+        <span>🏢</span>
+        Company Portal
+      </div>
+      <div class="navbar-user">
+        <span id="companyName">Loading...</span>
+        <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-value" id="internshipsCount">-</div>
+          <div class="stat-label">Posted Internships</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="applicationsCount">-</div>
+          <div class="stat-label">Total Applications</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="selectedCount">-</div>
+          <div class="stat-label">Selected Candidates</div>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">My Internships</div>
+            <button id="addInternshipBtn" class="btn btn-primary">+ Add Internship</button>
+          </div>
+          <div class="card-content">
+            <div id="internshipsContainer">
+              <div class="loading">
+                <div class="spinner"></div>
+                Loading internships...
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Applications</div>
+          </div>
+          <div class="card-content">
+            <div id="applicationsContainer">
+              <div class="loading">
+                <div class="spinner"></div>
+                Loading applications...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add/Edit Internship Modal -->
+    <div id="internshipModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title" id="modalTitle">Add Internship</h2>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <form id="internshipForm">
+          <div class="form-group">
+            <label class="form-label">Organization Name</label>
+            <input type="text" id="orgName" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sector</label>
+            <select id="sector" class="form-input" required>
+              <option value="">Select Sector</option>
+              <option value="technology">Technology</option>
+              <option value="finance">Finance</option>
+              <option value="healthcare">Healthcare</option>
+              <option value="education">Education</option>
+              <option value="government">Government</option>
+              <option value="manufacturing">Manufacturing</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input type="text" id="location" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Number of Seats</label>
+            <input type="number" id="seats" class="form-input" min="1" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Required Skills (comma-separated)</label>
+            <input type="text" id="skills" class="form-input" placeholder="e.g., Python, React, SQL">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact Email</label>
+            <input type="email" id="contactEmail" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="description" class="form-input" rows="3" placeholder="Brief description of the internship"></textarea>
+          </div>
+          <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Internship</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Applications Modal -->
+    <div id="applicationsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">Applications for <span id="internshipTitle"></span></h2>
+          <button class="close-btn" onclick="closeApplicationsModal()">&times;</button>
+        </div>
+        <div id="applicantsContainer">
+          <div class="loading">
+            <div class="spinner"></div>
+            Loading applications...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentInternshipId = null;
+
+      // API helper function
+      async function api(endpoint, options = {}) {
+        try {
+          const response = await fetch(endpoint, {
+            credentials: 'same-origin',
+            headers: {
+              'Content-Type': 'application/json',
+              ...options.headers
+            },
+            ...options
+          });
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          
+          return await response.json();
+        } catch (error) {
+          console.error('API Error:', error);
+          throw error;
+        }
+      }
+
+      // Load company info
+      async function loadCompanyInfo() {
+        try {
+          const data = await api('/company_profile');
+          document.getElementById('companyName').textContent = data.name || 'Company';
+        } catch (error) {
+          console.error('Failed to load company info:', error);
+        }
+      }
+
+      // Load company internships
+      async function loadInternships() {
+        try {
+          const data = await api('/company_internships');
+          const container = document.getElementById('internshipsContainer');
+          
+          if (!data.internships || data.internships.length === 0) {
+            container.innerHTML = '<div class="empty-state">No internships posted yet</div>';
+            return;
+          }
+
+          container.innerHTML = data.internships.map(internship => `
+            <div class="internship-card">
+              <div class="internship-header">
+                <div>
+                  <div class="internship-title">${internship.org_name || 'Unknown'}</div>
+                  <div style="color: #666; font-size: 0.875rem;">${internship.sector || 'General'}</div>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                  <button class="btn btn-secondary" onclick="editInternship('${internship.id}')">Edit</button>
+                  <button class="btn btn-primary" onclick="viewApplications('${internship.id}', '${internship.org_name}')">
+                    Applications (${internship.applications_count || 0})
+                  </button>
+                </div>
+              </div>
+              <div class="internship-details">
+                <span>📍 ${internship.location || 'Not specified'}</span>
+                <span>👥 ${internship.seats || 0} positions</span>
+                <span>📧 ${internship.contact_email || 'No email'}</span>
+              </div>
+              <div>
+                ${(internship.skills_required || '').split(',').map(skill => 
+                  `<span class="skill-tag">${skill.trim()}</span>`
+                ).join('')}
+              </div>
+            </div>
+          `).join('');
+
+          document.getElementById('internshipsCount').textContent = data.internships.length;
+        } catch (error) {
+          document.getElementById('internshipsContainer').innerHTML = 
+            '<div class="empty-state">Failed to load internships</div>';
+        }
+      }
+
+      // Load recent applications
+      async function loadRecentApplications() {
+        try {
+          const data = await api('/company_applications');
+          const container = document.getElementById('applicationsContainer');
+          
+          if (!data.applications || data.applications.length === 0) {
+            container.innerHTML = '<div class="empty-state">No applications yet</div>';
+            return;
+          }
+
+          container.innerHTML = data.applications.slice(0, 5).map(app => `
+            <div class="applicant-card">
+              <div class="applicant-header">
+                <div class="applicant-name">${app.student_name || 'Unknown'}</div>
+                <span style="font-size: 0.75rem; color: #666;">
+                  ${new Date(app.applied_at).toLocaleDateString()}
+                </span>
+              </div>
+              <div class="applicant-details">
+                Applied for: ${app.internship_title || 'Unknown Position'}
+              </div>
+            </div>
+          `).join('');
+
+          document.getElementById('applicationsCount').textContent = data.applications.length;
+          document.getElementById('selectedCount').textContent = 
+            data.applications.filter(app => app.status === 'accepted').length;
+        } catch (error) {
+          document.getElementById('applicationsContainer').innerHTML = 
+            '<div class="empty-state">Failed to load applications</div>';
+        }
+      }
+
+      // Open add internship modal
+      function openAddModal() {
+        currentInternshipId = null;
+        document.getElementById('modalTitle').textContent = 'Add Internship';
+        document.getElementById('internshipForm').reset();
+        document.getElementById('internshipModal').style.display = 'block';
+      }
+
+      // Edit internship
+      async function editInternship(id) {
+        try {
+          const data = await api(`/internship/${id}`);
+          currentInternshipId = id;
+          document.getElementById('modalTitle').textContent = 'Edit Internship';
+          
+          // Populate form
+          document.getElementById('orgName').value = data.org_name || '';
+          document.getElementById('sector').value = data.sector || '';
+          document.getElementById('location').value = data.location || '';
+          document.getElementById('seats').value = data.seats || '';
+          document.getElementById('skills').value = data.skills_required || '';
+          document.getElementById('contactEmail').value = data.contact_email || '';
+          document.getElementById('description').value = data.description || '';
+          
+          document.getElementById('internshipModal').style.display = 'block';
+        } catch (error) {
+          alert('Failed to load internship details');
+        }
+      }
+
+      // Close modal
+      function closeModal() {
+        document.getElementById('internshipModal').style.display = 'none';
+      }
+
+      // View applications for internship
+      async function viewApplications(internshipId, title) {
+        document.getElementById('internshipTitle').textContent = title;
+        document.getElementById('applicationsModal').style.display = 'block';
+        
+        try {
+          const data = await api(`/internship/${internshipId}/applications`);
+          const container = document.getElementById('applicantsContainer');
+          
+          if (!data.applications || data.applications.length === 0) {
+            container.innerHTML = '<div class="empty-state">No applications for this internship</div>';
+            return;
+          }
+
+          container.innerHTML = data.applications.map(app => `
+            <div class="applicant-card">
+              <div class="applicant-header">
+                <div class="applicant-name">${app.student_name || 'Unknown'}</div>
+                <span style="font-size: 0.75rem; color: #666;">
+                  Score: ${app.marks || 'N/A'}
+                </span>
+              </div>
+              <div class="applicant-details">
+                <div>📧 ${app.email || 'No email'}</div>
+                <div>🎯 Skills: ${app.skills || 'Not specified'}</div>
+                <div>📍 Location Preference: ${app.location_pref || 'Any'}</div>
+              </div>
+              <div class="applicant-actions">
+                <button class="btn btn-success" onclick="updateApplicationStatus('${app.id}', 'accepted')">
+                  Accept
+                </button>
+                <button class="btn btn-danger" onclick="updateApplicationStatus('${app.id}', 'rejected')">
+                  Reject
+                </button>
+              </div>
+            </div>
+          `).join('');
+        } catch (error) {
+          document.getElementById('applicantsContainer').innerHTML = 
+            '<div class="empty-state">Failed to load applications</div>';
+        }
+      }
+
+      // Close applications modal
+      function closeApplicationsModal() {
+        document.getElementById('applicationsModal').style.display = 'none';
+      }
+
+      // Update application status
+      async function updateApplicationStatus(applicationId, status) {
+        try {
+          await api('/update_application_status', {
+            method: 'POST',
+            body: JSON.stringify({ application_id: applicationId, status })
+          });
+          
+          alert(`Application ${status} successfully!`);
+          // Refresh the applications view
+          const internshipTitle = document.getElementById('internshipTitle').textContent;
+          // You might want to store the internship ID to refresh properly
+        } catch (error) {
+          alert('Failed to update application status');
+        }
+      }
+
+      // Handle form submission
+      document.getElementById('internshipForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = {
+          org_name: document.getElementById('orgName').value,
+          sector: document.getElementById('sector').value,
+          location: document.getElementById('location').value,
+          seats: parseInt(document.getElementById('seats').value),
+          skills_required: document.getElementById('skills').value,
+          contact_email: document.getElementById('contactEmail').value,
+          description: document.getElementById('description').value
+        };
+
+        try {
+          if (currentInternshipId) {
+            await api(`/internship/${currentInternshipId}`, {
+              method: 'PUT',
+              body: JSON.stringify(formData)
+            });
+            alert('Internship updated successfully!');
+          } else {
+            await api('/create_internship', {
+              method: 'POST',
+              body: JSON.stringify(formData)
+            });
+            alert('Internship created successfully!');
+          }
+          
+          closeModal();
+          await loadInternships();
+        } catch (error) {
+          alert('Failed to save internship');
+        }
+      });
+
+      // Event listeners
+      document.getElementById('addInternshipBtn').addEventListener('click', openAddModal);
+
+      document.getElementById('logoutBtn').addEventListener('click', async () => {
+        try {
+          await api('/admin_logout', { method: 'POST' });
+          window.location.href = '/admin';
+        } catch (error) {
+          window.location.href = '/admin';
+        }
+      });
+
+      // Close modals when clicking outside
+      window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+          e.target.style.display = 'none';
+        }
+      });
+
+      // Initial load
+      loadCompanyInfo();
+      loadInternships();
+      loadRecentApplications();
+    </script>
+  </body>
+</html>

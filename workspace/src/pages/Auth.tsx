@@ -225,6 +225,17 @@ const Auth = () => {
                 </form>
               </TabsContent>
             </Tabs>
+            <div className="mt-6 text-center text-sm text-muted-foreground">
+              Are you an administrator? 
+              <a
+                href="http://127.0.0.1:5000/admin"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline font-medium"
+              >
+                Admin Login
+              </a>
+            </div>
           </CardContent>
         </Card>
       </div>

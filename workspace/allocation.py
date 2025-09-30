@@ -90,7 +90,6 @@
 #     if isinstance(value, list):
 #         return [str(v).strip() for v in value if str(v).strip()]
 #     return [v.strip() for v in str(value).split(",") if v.strip()]
-
 from typing import List, Dict, Any, Set
 def run_allocation(students: List[Dict[str, Any]], internships: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     allocations: List[Dict[str, Any]] = []

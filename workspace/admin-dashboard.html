@@ -122,14 +122,15 @@
         <div class="card-header">
           <div class="card-title">Admin Actions</div>
           <div style="display: flex; gap: 0.5rem;">
-            <button id="populateDataBtn" class="btn btn-secondary">
-              <span id="populateText">Add Sample Data</span>
-              <span id="populateSpinner" class="spinner" style="display:none;"></span>
-            </button>
             <button id="runAllocationBtn" class="btn btn-primary">
               <span id="runText">Run Allocation</span>
               <span id="runSpinner" class="spinner" style="display:none;"></span>
             </button>
+            <button id="debugBtn" class="btn btn-secondary">Debug DB</button>
+            <button id="testInsertBtn" class="btn btn-secondary">Test Insert</button>
+            <button id="simpleInsertBtn" class="btn btn-secondary">Simple Insert</button>
+            <button id="rawAllocationsBtn" class="btn btn-secondary">Raw Allocations</button>
+            <button id="refreshAllocationsBtn" class="btn btn-secondary">Refresh Allocations</button>
           </div>
         </div>
       </div>
@@ -268,23 +269,40 @@
       }
 
       async function loadAllocations() {
+        console.log('=== LOADING ALLOCATIONS ===');
         const data = await api('/get_allocations');
+        console.log('Allocations API response:', data);
+        
         const body = document.getElementById('allocationsBody');
-        if (!data) return;
+        if (!data) {
+          console.log('No data received from API');
+          return;
+        }
+        
+        console.log('Allocations array:', data.allocations);
+        console.log('Allocations count:', data.allocations ? data.allocations.length : 'undefined');
+        
         if (!data.allocations || data.allocations.length === 0) {
+          console.log('No allocations found - showing empty message');
           body.innerHTML = '<tr><td colspan="6" class="empty">No allocations found</td></tr>';
           return;
         }
-        body.innerHTML = data.allocations.map(a => `
-          <tr>
-            <td>${a.id}</td>
-            <td>${a.student_name || '-'}</td>
-            <td>${a.internship_org || '-'}</td>
-            <td>${a.sector || '-'}</td>
-            <td>${a.score?.toFixed ? a.score.toFixed(1) : a.score}</td>
-            <td>${a.allocation_type || '-'}</td>
-          </tr>
-        `).join('');
+        
+        console.log('Rendering allocations table with', data.allocations.length, 'items');
+        body.innerHTML = data.allocations.map(a => {
+          console.log('Rendering allocation:', a);
+          return `
+            <tr>
+              <td>${a.id}</td>
+              <td>${a.student_name || '-'}</td>
+              <td>${a.internship_org || '-'}</td>
+              <td>${a.sector || '-'}</td>
+              <td>${a.score?.toFixed ? a.score.toFixed(1) : a.score}</td>
+              <td>${a.allocation_type || '-'}</td>
+            </tr>
+          `;
+        }).join('');
+        console.log('Allocations table updated');
       }
 
       async function runAllocation() {
@@ -317,38 +335,55 @@
         }
       }
 
-      async function populateSampleData() {
-        const btn = document.getElementById('populateDataBtn');
-        const text = document.getElementById('populateText');
-        const spinner = document.getElementById('populateSpinner');
-        
-        btn.disabled = true; 
-        spinner.style.display = 'inline-block'; 
-        text.textContent = 'Adding...';
-        
-        try {
-          const res = await api('/populate_sample_data', { method: 'POST', body: JSON.stringify({}) });
-          
-          if (res && res.message) {
-            await Promise.all([loadDashboard(), loadStudents(), loadInternships()]);
-            alert(`✅ ${res.message}\n\nAdded ${res.students_added} students and ${res.internships_added} internships.`);
-          } else if (res && res.error) {
-            alert(`❌ Error: ${res.error}\n${res.message || ''}`);
-          } else {
-            alert('❌ Failed to add sample data.');
-          }
-        } catch (error) {
-          console.error('Populate data error:', error);
-          alert('❌ Network error. Please try again.');
-        } finally {
-          btn.disabled = false; 
-          spinner.style.display = 'none'; 
-          text.textContent = 'Add Sample Data';
-        }
-      }
-
-      document.getElementById('populateDataBtn').addEventListener('click', populateSampleData);
       document.getElementById('runAllocationBtn').addEventListener('click', runAllocation);
+      
+      document.getElementById('debugBtn').addEventListener('click', async () => {
+        try {
+          const data = await api('/debug_db');
+          console.log('Debug data:', data);
+          alert(`Debug Info:\nClient: ${data.client_type}\nStudents: ${data.students_count}\nInternships: ${data.internships_count}\nAllocations: ${data.allocations_count}\n\nCheck console for full data.`);
+        } catch (error) {
+          alert('Debug failed: ' + error);
+        }
+      });
+      
+      document.getElementById('testInsertBtn').addEventListener('click', async () => {
+        try {
+          const data = await api('/test_allocation_insert', { method: 'POST' });
+          console.log('Test insert result:', data);
+          alert(`Test Insert Result:\n${data.message}\nTotal allocations: ${data.total_allocations}`);
+          await loadAllocations(); // Refresh allocations table
+        } catch (error) {
+          alert('Test insert failed: ' + error);
+        }
+      });
+      
+      document.getElementById('simpleInsertBtn').addEventListener('click', async () => {
+        try {
+          const data = await api('/test_simple_insert', { method: 'POST' });
+          console.log('Simple insert result:', data);
+          alert(`Simple Insert Result:\n${data.message}\nSuccess: ${data.success}\nCheck Flask console for details`);
+        } catch (error) {
+          alert('Simple insert failed: ' + error);
+        }
+      });
+      
+      document.getElementById('rawAllocationsBtn').addEventListener('click', async () => {
+        try {
+          const data = await api('/raw_allocations');
+          console.log('Raw allocations result:', data);
+          alert(`Raw Allocations:\nCount: ${data.count}\nCheck console for full data`);
+        } catch (error) {
+          alert('Raw allocations failed: ' + error);
+        }
+      });
+      
+      document.getElementById('refreshAllocationsBtn').addEventListener('click', async () => {
+        console.log('Manual refresh of allocations triggered');
+        await loadAllocations();
+        alert('Allocations refreshed - check console for details');
+      });
+      
       document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
           await api('/admin_logout', { method: 'POST' });
