@@ -7,14 +7,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { LogIn, UserPlus, GraduationCap } from 'lucide-react';
+import { LogIn, UserPlus, GraduationCap, Shield, Users, Building } from 'lucide-react';
 
 const Auth = () => {
   const { toast } = useToast();
   const { user, signIn, signUp, loading } = useAuth();
   const [formLoading, setFormLoading] = useState(false);
-  const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [signupData, setSignupData] = useState({ email: '', password: '', fullName: '', confirmPassword: '' });
+  const [loginData, setLoginData] = useState({ email: '', password: '', role: 'admin' });
+  const [signupData, setSignupData] = useState({ email: '', password: '', fullName: '', confirmPassword: '', role: 'student' });
+
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case 'admin': return <Shield className="h-4 w-4" />;
+      case 'student': return <Users className="h-4 w-4" />;
+      case 'company': return <Building className="h-4 w-4" />;
+      default: return <Shield className="h-4 w-4" />;
+    }
+  };
+
+  const roles = [
+    { value: 'admin', label: 'Admin', icon: Shield },
+    { value: 'student', label: 'Student', icon: Users },
+    { value: 'company', label: 'Company', icon: Building }
+  ];
 
   // Redirect if already authenticated
   if (user && !loading) {
@@ -25,18 +40,55 @@ const Auth = () => {
     e.preventDefault();
     setFormLoading(true);
 
-    const { error } = await signIn(loginData.email, loginData.password);
-    
-    if (error) {
+    try {
+      // Determine the correct endpoint based on role
+      let endpoint = '/admin_login';
+      if (loginData.role === 'student') endpoint = '/student_login';
+      if (loginData.role === 'company') endpoint = '/company_login';
+
+      const response = await fetch(`http://127.0.0.1:5000${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          email: loginData.email,
+          password: loginData.password,
+          userType: loginData.role
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Welcome back!",
+          description: "Successfully logged in",
+        });
+
+        // Redirect based on role
+        setTimeout(() => {
+          if (loginData.role === 'admin') {
+            window.location.href = 'http://127.0.0.1:5000/admin-dashboard';
+          } else if (loginData.role === 'student') {
+            window.location.href = 'http://127.0.0.1:5000/student-dashboard';
+          } else if (loginData.role === 'company') {
+            window.location.href = 'http://127.0.0.1:5000/company-dashboard';
+          }
+        }, 1000);
+      } else {
+        toast({
+          title: "Login Failed",
+          description: data.message || "Invalid credentials",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
       toast({
         title: "Login Failed",
-        description: error.message,
+        description: "Network error. Please try again.",
         variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Welcome back!",
-        description: "Successfully logged in",
       });
     }
     
@@ -95,7 +147,7 @@ const Auth = () => {
             </div>
             <CardTitle className="text-2xl font-bold">Optima</CardTitle>
             <CardDescription>
-              Sign in to access your dashboard
+              Smart Internship Allocation System - Choose your role to continue
             </CardDescription>
           </CardHeader>
           
@@ -112,6 +164,36 @@ const Auth = () => {
 
               <TabsContent value="login" className="space-y-4">
                 <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Login as:</Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {roles.map((role) => {
+                        const IconComponent = role.icon;
+                        return (
+                          <label
+                            key={role.value}
+                            className={`flex flex-col items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                              loginData.role === role.value
+                                ? 'border-primary bg-primary/5 text-primary'
+                                : 'border-border hover:border-primary/50'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="loginRole"
+                              value={role.value}
+                              checked={loginData.role === role.value}
+                              onChange={(e) => setLoginData(prev => ({ ...prev, role: e.target.value }))}
+                              className="sr-only"
+                            />
+                            <IconComponent className="h-5 w-5 mb-1" />
+                            <span className="text-xs font-medium">{role.label}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
@@ -158,6 +240,36 @@ const Auth = () => {
 
               <TabsContent value="signup" className="space-y-4">
                 <form onSubmit={handleSignup} className="space-y-4">
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Sign up as:</Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {roles.map((role) => {
+                        const IconComponent = role.icon;
+                        return (
+                          <label
+                            key={role.value}
+                            className={`flex flex-col items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                              signupData.role === role.value
+                                ? 'border-primary bg-primary/5 text-primary'
+                                : 'border-border hover:border-primary/50'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="signupRole"
+                              value={role.value}
+                              checked={signupData.role === role.value}
+                              onChange={(e) => setSignupData(prev => ({ ...prev, role: e.target.value }))}
+                              className="sr-only"
+                            />
+                            <IconComponent className="h-5 w-5 mb-1" />
+                            <span className="text-xs font-medium">{role.label}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="fullName">Full Name</Label>
                     <Input
@@ -226,15 +338,12 @@ const Auth = () => {
               </TabsContent>
             </Tabs>
             <div className="mt-6 text-center text-sm text-muted-foreground">
-              Are you an administrator? 
-              <a
-                href="http://127.0.0.1:5000/admin"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline font-medium"
-              >
-                Admin Login
-              </a>
+              <p className="flex items-center justify-center gap-2">
+                <Shield className="h-4 w-4" />
+                <Users className="h-4 w-4" />
+                <Building className="h-4 w-4" />
+              </p>
+              <p className="mt-2">Unified portal for all user types</p>
             </div>
           </CardContent>
         </Card>

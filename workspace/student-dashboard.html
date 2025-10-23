@@ -440,16 +440,41 @@
       document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
           await api('/admin_logout', { method: 'POST' });
-          window.location.href = '/admin';
+          window.location.href = '/react';
         } catch (error) {
-          window.location.href = '/admin';
+          window.location.href = '/react';
         }
       });
 
-      // Initial load
-      loadUserInfo();
-      loadInternships();
-      loadApplications();
+      // Debug session first
+      async function debugSession() {
+        try {
+          const sessionData = await api('/debug_session');
+          console.log('Session Debug:', sessionData);
+          if (!sessionData.logged_in) {
+            console.error('Not logged in! Redirecting to login...');
+            window.location.href = '/react';
+            return false;
+          }
+          return true;
+        } catch (error) {
+          console.error('Session debug failed:', error);
+          window.location.href = '/react';
+          return false;
+        }
+      }
+
+      // Initial load with session check
+      async function initializeDashboard() {
+        const sessionValid = await debugSession();
+        if (sessionValid) {
+          loadUserInfo();
+          loadInternships();
+          loadApplications();
+        }
+      }
+
+      initializeDashboard();
     </script>
   </body>
 </html>

@@ -450,6 +450,7 @@
       // API helper function
       async function api(endpoint, options = {}) {
         try {
+          console.log(`Making API call to: ${endpoint}`);
           const response = await fetch(endpoint, {
             credentials: 'same-origin',
             headers: {
@@ -459,11 +460,24 @@
             ...options
           });
           
+          console.log(`Response status: ${response.status}`);
+          
           if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+            const errorText = await response.text();
+            console.error(`API Error Response: ${errorText}`);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
           }
           
-          return await response.json();
+          const responseText = await response.text();
+          console.log(`Response text: ${responseText}`);
+          
+          // Check if response is JSON
+          if (responseText.trim().startsWith('{') || responseText.trim().startsWith('[')) {
+            return JSON.parse(responseText);
+          } else {
+            console.error('Response is not JSON:', responseText);
+            throw new Error('Server returned HTML instead of JSON');
+          }
         } catch (error) {
           console.error('API Error:', error);
           throw error;
@@ -701,9 +715,9 @@
       document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
           await api('/admin_logout', { method: 'POST' });
-          window.location.href = '/admin';
+          window.location.href = '/react';
         } catch (error) {
-          window.location.href = '/admin';
+          window.location.href = '/react';
         }
       });
 
@@ -714,10 +728,35 @@
         }
       });
 
-      // Initial load
-      loadCompanyInfo();
-      loadInternships();
-      loadRecentApplications();
+      // Debug session first
+      async function debugSession() {
+        try {
+          const sessionData = await api('/debug_session');
+          console.log('Session Debug:', sessionData);
+          if (!sessionData.logged_in) {
+            console.error('Not logged in! Redirecting to login...');
+            window.location.href = '/react';
+            return false;
+          }
+          return true;
+        } catch (error) {
+          console.error('Session debug failed:', error);
+          window.location.href = '/react';
+          return false;
+        }
+      }
+
+      // Initial load with session check
+      async function initializeDashboard() {
+        const sessionValid = await debugSession();
+        if (sessionValid) {
+          loadCompanyInfo();
+          loadInternships();
+          loadRecentApplications();
+        }
+      }
+
+      initializeDashboard();
     </script>
   </body>
 </html>

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, jsonify, session, send_from_directory
+from flask import Flask, request, jsonify, session, send_from_directory, redirect
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 from dotenv import load_dotenv
@@ -10,7 +10,15 @@ from allocation_fixed import run_allocation
 load_dotenv()
 
 def create_app():
-    app = Flask(__name__, static_url_path='/static', static_folder='.')
+    app = Flask(__name__, static_url_path='', static_folder='dist')
+
+    # Serve static assets from dist/assets/
+    # ...existing code...
+
+    # Catch-all route for SPA (React) - serve index.html for any unknown route
+    @app.errorhandler(404)
+    def not_found(e):
+        return send_from_directory(app.static_folder, 'index.html')
     app.secret_key = os.getenv("SECRET_KEY", "dev-secret")
     app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
     app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -299,6 +307,7 @@ def create_app():
                 session["company_name"] = company.get("org_name", "Company")
                 session.permanent = True
                 print(f"Company login successful: {company.get('org_name', 'Company')}")
+                print(f"Session data: {dict(session)}")
                 return jsonify({"message": "Login successful", "company": company.get("org_name", "Company")}), 200
             
             print("Company login failed - invalid credentials")
@@ -397,7 +406,7 @@ def create_app():
         try:
             supabase = get_supabase()
             
-            # Fetch allocations first
+            # Fetch allocations first            py .\app.py
             allocations_response = supabase.table("allocations").select("*").execute()
             print(f"=== GET_ALLOCATIONS DEBUG ===")
             print(f"Raw allocations response: {allocations_response.data}")
@@ -536,61 +545,51 @@ def create_app():
     def home():
         return """
         <html>
-        <head><title>Optima - Admin & Main App</title></head>
+        <head><title>Optima - Smart Internship Allocation</title></head>
         <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
             <h1>🎓 Optima - Smart Internship Allocation</h1>
             <p>Choose your access point:</p>
             <div style="margin: 30px;">
-                <a href="/admin" style="display: inline-block; margin: 10px; padding: 15px 30px; background: #3b82f6; color: white; text-decoration: none; border-radius: 8px;">🛡️ Admin Dashboard</a>
-                <a href="http://localhost:5173" target="_blank" style="display: inline-block; margin: 10px; padding: 15px 30px; background: #10b981; color: white; text-decoration: none; border-radius: 8px;">🚀 Main App (React)</a>
+                <a href="/react" style="display: inline-block; margin: 10px; padding: 15px 30px; background: #10b981; color: white; text-decoration: none; border-radius: 8px;">🚀 Main App (React)</a>
+                <a href="/admin" style="display: inline-block; margin: 10px; padding: 15px 30px; background: #3b82f6; color: white; text-decoration: none; border-radius: 8px;">🛡️ Legacy Admin</a>
             </div>
-            <p style="color: #666; margin-top: 30px;">Admin credentials: zainab.n.shaikh1346@gmail.com / zainab1346</p>
+            <p style="color: #666; margin-top: 30px;">Use React App for unified multi-role login</p>
         </body>
         </html>
         """
     
+    # Serve React index.html for SPA routes from dist/
+    @app.route("/react")
+    @app.route("/auth")
     @app.route("/admin")
-    def admin_redirect():
-        return send_from_directory('.', 'admin.html')
-    
     @app.route("/admin-dashboard")
-    def admin_dashboard_redirect():
-        if not session.get("logged_in") or session.get("user_type") != "admin":
-            print("Unauthorized access to admin dashboard - redirecting to login")
-            return """
-            <script>
-                alert('Please login first');
-                window.location.href = '/admin';
-            </script>
-            """
-        print("Authorized access to admin dashboard")
-        return send_from_directory('.', 'admin-dashboard.html')
-    
     @app.route("/student-dashboard")
-    def student_dashboard_redirect():
-        if not session.get("logged_in") or session.get("user_type") != "student":
-            print("Unauthorized access to student dashboard - redirecting to login")
-            return """
-            <script>
-                alert('Please login first');
-                window.location.href = '/admin';
-            </script>
-            """
-        print("Authorized access to student dashboard")
-        return send_from_directory('.', 'student-dashboard.html')
-    
     @app.route("/company-dashboard")
-    def company_dashboard_redirect():
-        if not session.get("logged_in") or session.get("user_type") != "company":
-            print("Unauthorized access to company dashboard - redirecting to login")
+    def spa_routes():
+        route = request.path
+        if route == "/admin-dashboard" and (not session.get("logged_in") or session.get("user_type") != "admin"):
             return """
             <script>
                 alert('Please login first');
                 window.location.href = '/admin';
             </script>
             """
-        print("Authorized access to company dashboard")
-        return send_from_directory('.', 'company-dashboard.html')
+        if route == "/student-dashboard" and (not session.get("logged_in") or session.get("user_type") != "student"):
+            return """
+            <script>
+                alert('Please login first');
+                window.location.href = '/admin';
+            </script>
+            """
+        if route == "/company-dashboard" and (not session.get("logged_in") or session.get("user_type") != "company"):
+            return """
+            <script>
+                alert('Please login first');
+                window.location.href = '/admin';
+            </script>
+            """
+        # Serve index.html for SPA from dist/
+        return send_from_directory(app.static_folder, 'index.html')
     
     # Student API endpoints
     @app.route("/student_profile", methods=["GET"])
@@ -650,16 +649,26 @@ def create_app():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-    # Company API endpoints
+    # ...existing code...
+
+    # ...existing code...
+
+    # ...existing code...
+
+    # ...existing code...
     @app.route("/company_profile", methods=["GET"])
     def company_profile():
+        print(f"Company profile request - Session: {dict(session)}")
         if not session.get("logged_in") or session.get("user_type") != "company":
+            print("Unauthorized company profile access")
             return jsonify({"message": "Unauthorized"}), 401
         
         try:
             company_name = session.get("company_name", "Company")
+            print(f"Returning company profile: {company_name}")
             return jsonify({"name": company_name}), 200
         except Exception as e:
+            print(f"Company profile error: {e}")
             return jsonify({"error": str(e)}), 500
 
     @app.route("/company_internships", methods=["GET"])
@@ -730,11 +739,44 @@ def create_app():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-    @app.route("/static/<path:filename>")
-    def static_files(filename):
-        return send_from_directory('.', filename)
+    @app.route("/internship/<internship_id>/applications", methods=["GET"])
+    def internship_applications(internship_id):
+        if not session.get("logged_in") or session.get("user_type") != "company":
+            return jsonify({"message": "Unauthorized"}), 401
+        
+        try:
+            # For now, return empty applications as we need to create applications table
+            return jsonify({"applications": []}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    @app.route("/update_application_status", methods=["POST"])
+    def update_application_status():
+        if not session.get("logged_in") or session.get("user_type") != "company":
+            return jsonify({"message": "Unauthorized"}), 401
+        
+        try:
+            data = request.get_json()
+            # For now, just return success as we need to create applications table
+            return jsonify({"message": "Application status updated successfully"}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    # Serve static files from dist/assets/
+    @app.route('/assets/<path:filename>')
+    def dist_assets(filename):
+        return send_from_directory(os.path.join(app.static_folder, 'assets'), filename)
+    
+    @app.route("/debug_session", methods=["GET"])
+    def debug_session():
+        return jsonify({
+            "session_data": dict(session),
+            "logged_in": session.get("logged_in", False),
+            "user_type": session.get("user_type", "none"),
+            "cookies": dict(request.cookies)
+        })
     
     return app
 if __name__ == "__main__":
     app = create_app()
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
